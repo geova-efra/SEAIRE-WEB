@@ -17,7 +17,9 @@ a{text-decoration:none;color:inherit}
 .container{width:min(92%,var(--max));margin:auto}
 nav{position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(7,17,31,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .nav{height:76px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:25px;font-weight:900;letter-spacing:2px}.logo span{color:var(--accent)}
+.logo{display:flex;align-items:center;height:62px;width:150px;overflow:hidden}
+.logo img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.logo span{color:var(--accent)}
 .links{display:flex;gap:26px;font-size:14px;color:#dce6f1}.links a:hover{color:var(--accent)}
 .cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 21px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#1684ff);font-weight:800;box-shadow:0 10px 30px rgba(24,182,255,.2)}
 .hero{min-height:760px;padding:150px 0 90px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:50px;background:
@@ -45,24 +47,87 @@ h2{font-size:42px;line-height:1.1;margin-bottom:14px;letter-spacing:-1.5px}.lead
 footer{border-top:1px solid var(--line);padding:35px 0;color:var(--muted);font-size:13px}.footer{display:flex;justify-content:space-between;gap:20px}
 .whatsapp{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#25d366;color:#fff;font-size:26px;font-weight:900;z-index:30;box-shadow:0 12px 30px rgba(37,211,102,.25)}
 @media(max-width:850px){.links{display:none}.hero,.about,.quote{grid-template-columns:1fr}.visual{height:350px}.cards,.project-grid{grid-template-columns:1fr}.hero{padding-top:125px}h1{letter-spacing:-2px}.footer{flex-direction:column}}
+
+.real-logo{display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,#0d2943,#071522)}
+.real-logo{min-height:480px}
+.real-logo img{display:block;width:100%;height:100%;object-fit:contain;border-radius:18px;filter:drop-shadow(0 18px 35px rgba(0,0,0,.35))}
+.logo-fallback{display:flex;align-items:center;justify-content:center}
+.logo-fallback-text{display:none;font-size:72px;font-weight:900;letter-spacing:5px;color:#fff}
+.logo-fallback .logo-fallback-text{display:block}
+
+/* ===== FLYER SEAIRE ===== */
+.flyer-section{
+  min-height:100vh;
+  padding:105px 20px 45px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(24,182,255,.12), transparent 35%),
+    #050d18;
+}
+.flyer-wrap{
+  width:min(100%, 620px);
+  display:flex;
+  justify-content:center;
+}
+.flyer-wrap img{
+  display:block;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  max-height:calc(100vh - 150px);
+  object-fit:contain;
+  border-radius:14px;
+  box-shadow:0 25px 70px rgba(0,0,0,.5);
+}
+@media(max-width:850px){
+  .flyer-section{
+    min-height:auto;
+    padding:92px 10px 25px;
+    align-items:flex-start;
+  }
+  .flyer-wrap img{
+    width:100%;
+    max-height:none;
+    border-radius:10px;
+  }
+}
+
 </style>
 </head>
 <body>
 <nav><div class="container nav">
-  <a class="logo" href="#">SEA<span>IRE</span></a>
-  <div class="links"><a href="#inicio">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
+  <a class="logo" href="#" aria-label="SEAIRE">
+    <img src="./logo-seaire.jpeg" alt="SEAIRE - Soluciones Eléctricas" class="nav-logo"
+         onerror="this.style.display='none'; this.parentElement.textContent='SEAIRE';">
+  </a>
+  <div class="links"><a href="#flyer">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
   <a class="cta" href="#cotizacion">Contáctanos</a>
 </div></nav>
 
 <main>
+
+<section class="flyer-section" id="flyer" aria-label="Flyer oficial de SEAIRE">
+  <div class="flyer-wrap">
+    <img src="./logo-seaire.jpeg"
+         alt="Flyer oficial de SEAIRE - Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales">
+  </div>
+</section>
+
 <section class="hero container" id="inicio">
   <div>
-    <div class="badge">Ingeniería • Automatización • Energía</div>
+    <div class="badge">INGENIERÍA • AUTOMATIZACIÓN • ENERGÍA • DESARROLLO</div>
     <h1>Soluciones eléctricas para <span>proyectos reales.</span></h1>
     <p>Diseñamos, construimos y mantenemos soluciones eléctricas, industriales, residenciales y especiales con enfoque técnico, seguridad y confiabilidad.</p>
     <div class="actions"><a class="cta" href="#cotizacion">Solicitar cotización</a><a class="secondary" href="#servicios">Explorar servicios →</a></div>
   </div>
-  <div class="visual"><div class="grid"></div><div class="orbit"></div><div class="core">⚡</div><i class="node n1"></i><i class="node n2"></i><i class="node n3"></i><i class="node n4"></i></div>
+  <div class="visual real-logo">
+  <img src="./logo-seaire.jpeg"
+       alt="SEAIRE - Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales"
+       onerror="this.style.display='none'; this.parentElement.classList.add('logo-fallback');">
+  <div class="logo-fallback-text">SEAIRE</div>
+</div>
 </section>
 
 <section id="servicios"><div class="container">
