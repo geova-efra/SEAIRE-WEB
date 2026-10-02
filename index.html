@@ -17,7 +17,9 @@ a{text-decoration:none;color:inherit}
 .container{width:min(92%,var(--max));margin:auto}
 nav{position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(7,17,31,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .nav{height:76px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:25px;font-weight:900;letter-spacing:2px}.logo span{color:var(--accent)}
+.logo{display:flex;align-items:center;height:62px;width:150px;overflow:hidden}
+.logo img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.logo span{color:var(--accent)}
 .links{display:flex;gap:26px;font-size:14px;color:#dce6f1}.links a:hover{color:var(--accent)}
 .cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 21px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#1684ff);font-weight:800;box-shadow:0 10px 30px rgba(24,182,255,.2)}
 .hero{min-height:760px;padding:150px 0 90px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:50px;background:
@@ -53,32 +55,59 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:var(--muted);font-s
 .logo-fallback-text{display:none;font-size:72px;font-weight:900;letter-spacing:5px;color:#fff}
 .logo-fallback .logo-fallback-text{display:block}
 
-/* Ajuste de espaciado: bloques más compactos */
-section{padding-top:42px!important;padding-bottom:42px!important}
-.hero{padding-top:54px!important;padding-bottom:54px!important}
-.section-head{margin-bottom:24px!important}
-.cards{gap:18px!important}
-.card{padding:22px!important}
-
-.institutional{position:relative}
-.about-grid{display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:18px}
-.about-card{padding:28px;border:1px solid rgba(120,190,230,.18);border-radius:22px;background:linear-gradient(145deg,rgba(16,48,75,.72),rgba(7,23,38,.88));box-shadow:0 16px 40px rgba(0,0,0,.16)}
-.about-card h3{margin:0 0 12px;font-size:22px}
-.about-card p{margin:0;line-height:1.75;color:#b9cce0}
-.about-main{background:linear-gradient(145deg,rgba(18,63,95,.8),rgba(7,23,38,.9))}
-.about-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#18a8ff,#00d6b4);color:#071522;font-weight:900;margin-bottom:18px}
-@media(max-width:900px){.about-grid{grid-template-columns:1fr}.hero{padding-top:36px!important;padding-bottom:36px!important}}
+/* ===== FLYER SEAIRE ===== */
+.flyer-section{
+  min-height:100vh;
+  padding:105px 20px 45px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(24,182,255,.12), transparent 35%),
+    #050d18;
+}
+.flyer-wrap{
+  width:min(100%, 620px);
+  display:flex;
+  justify-content:center;
+}
+.flyer-wrap img{
+  display:block;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  max-height:calc(100vh - 150px);
+  object-fit:contain;
+  border-radius:14px;
+  box-shadow:0 25px 70px rgba(0,0,0,.5);
+}
+@media(max-width:850px){
+  .flyer-section{
+    min-height:auto;
+    padding:92px 10px 25px;
+    align-items:flex-start;
+  }
+  .flyer-wrap img{
+    width:100%;
+    max-height:none;
+    border-radius:10px;
+  }
+}
 
 </style>
 </head>
 <body>
 <nav><div class="container nav">
-  <a class="logo" href="#">SEA<span>IRE</span></a>
+  <a class="logo" href="#" aria-label="SEAIRE">
+    <img src="./logo-seaire.jpeg" alt="SEAIRE - Soluciones Eléctricas" class="nav-logo"
+         onerror="this.style.display='none'; this.parentElement.textContent='SEAIRE';">
+  </a>
   <div class="links"><a href="#inicio">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
   <a class="cta" href="#cotizacion">Contáctanos</a>
 </div></nav>
 
 <main>
+
 <section class="hero container" id="inicio">
   <div>
     <div class="badge">INGENIERÍA • AUTOMATIZACIÓN • ENERGÍA • DESARROLLO</div>
@@ -87,7 +116,7 @@ section{padding-top:42px!important;padding-bottom:42px!important}
     <div class="actions"><a class="cta" href="#cotizacion">Solicitar cotización</a><a class="secondary" href="#servicios">Explorar servicios →</a></div>
   </div>
   <div class="visual real-logo">
-  <img src="./logo-seaire.jpg"
+  <img src="./logo-seaire.jpeg"
        alt="SEAIRE - Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales"
        onerror="this.style.display='none'; this.parentElement.classList.add('logo-fallback');">
   <div class="logo-fallback-text">SEAIRE</div>
@@ -119,44 +148,6 @@ section{padding-top:42px!important;padding-bottom:42px!important}
   <div><div class="eyebrow">SEAIRE</div><h2>Una empresa enfocada en soluciones eléctricas.</h2><p class="lead">SEAIRE INGENIERÍA ELÉCTRICA S.A.S. integra ingeniería, ejecución y servicio técnico para resolver necesidades eléctricas y de automatización.</p><div class="stats"><div class="stat"><strong>01</strong>Diseño técnico</div><div class="stat"><strong>02</strong>Ejecución</div><div class="stat"><strong>03</strong>Pruebas</div><div class="stat"><strong>04</strong>Puesta en servicio</div></div></div>
   <div class="card"><h3>Trabajamos con enfoque integral</h3><p>Desde la identificación de la necesidad hasta la entrega de una solución operativa. La web también podrá crecer con un catálogo, sistema de clientes, seguimiento de proyectos y generación de cotizaciones.</p><br><a class="cta" href="#cotizacion">Quiero una solución</a></div>
 </div></section>
-
-
-<section id="nosotros" class="institutional">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Quiénes somos</div>
-      <h2>Ingeniería que transforma ideas en soluciones.</h2>
-    </div>
-    <div class="about-grid">
-      <article class="about-card about-main">
-        <h3>¿Quiénes somos?</h3>
-        <p>
-          Somos una empresa comprometida con el desarrollo de soluciones eléctricas,
-          automatizaciones industriales, residenciales y especiales. Trabajamos con
-          enfoque técnico y humano para cumplir estándares de calidad, seguridad,
-          innovación y responsabilidad, aportando al bienestar de nuestros clientes
-          y al desarrollo sostenible de la región.
-        </p>
-      </article>
-      <article class="about-card">
-        <div class="about-icon">M</div>
-        <h3>Misión</h3>
-        <p>
-          Brindar soluciones eléctricas y de automatización con calidad, seguridad
-          e innovación, generando confianza y satisfacción en nuestros clientes.
-        </p>
-      </article>
-      <article class="about-card">
-        <div class="about-icon">V</div>
-        <h3>Visión</h3>
-        <p>
-          Ser una empresa referente en soluciones eléctricas y automatización en
-          la región, reconocida por su profesionalismo y aporte al desarrollo.
-        </p>
-      </article>
-    </div>
-  </div>
-</section>
 
 <section id="cotizacion"><div class="container">
   <div class="quote"><div><div class="eyebrow">Cotizaciones</div><h2>Cuéntanos qué necesitas.</h2><p class="lead">Envíanos los datos básicos del proyecto y prepararemos el siguiente paso.</p></div>
