@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SEAIRE Ingeniería Eléctrica S.A.S. - Soluciones eléctricas, automatización industrial, residencial y especial.">
+<title>SEAIRE | Ingeniería Eléctrica</title>
+<style>
+:root{
+  --bg:#07111f;--bg2:#0b1b2e;--card:#10243a;--text:#f5f8fc;--muted:#a9b7c8;
+  --accent:#18b6ff;--accent2:#00e5a8;--line:rgba(255,255,255,.1);--max:1180px
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{text-decoration:none;color:inherit}
+.container{width:min(92%,var(--max));margin:auto}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(7,17,31,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.nav{height:76px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:25px;font-weight:900;letter-spacing:2px}.logo span{color:var(--accent)}
+.links{display:flex;gap:26px;font-size:14px;color:#dce6f1}.links a:hover{color:var(--accent)}
+.cta{display:inline-flex;align-items:center;justify-content:center;padding:13px 21px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#1684ff);font-weight:800;box-shadow:0 10px 30px rgba(24,182,255,.2)}
+.hero{min-height:760px;padding:150px 0 90px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:50px;background:
+radial-gradient(circle at 78% 30%,rgba(24,182,255,.16),transparent 30%),
+radial-gradient(circle at 20% 80%,rgba(0,229,168,.08),transparent 28%)}
+.badge{display:inline-block;border:1px solid rgba(24,182,255,.35);color:#7dd8ff;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
+h1{font-size:clamp(44px,6vw,78px);line-height:1.02;letter-spacing:-3px;margin-bottom:24px}
+h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent}
+.hero p{font-size:19px;color:var(--muted);max-width:650px;margin-bottom:30px}
+.actions{display:flex;gap:14px;flex-wrap:wrap}.secondary{padding:12px 20px;border:1px solid var(--line);border-radius:10px;color:#dce6f1}
+.visual{height:480px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(145deg,#102943,#071522);position:relative;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:38px 38px}
+.orbit{position:absolute;width:300px;height:300px;border:1px solid rgba(24,182,255,.35);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 70px rgba(24,182,255,.12)}
+.orbit:before,.orbit:after{content:"";position:absolute;border:1px solid rgba(0,229,168,.25);border-radius:50%;inset:35px}.orbit:after{inset:85px}
+.core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:95px;height:95px;border-radius:22px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 60px rgba(24,182,255,.45);display:grid;place-items:center;font-size:38px;font-weight:900;color:#061321}
+.node{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--accent2);box-shadow:0 0 20px var(--accent2)}
+.n1{left:16%;top:28%}.n2{right:16%;top:22%}.n3{right:18%;bottom:23%}.n4{left:18%;bottom:20%}
+section{padding:100px 0}.section-head{max-width:700px;margin-bottom:45px}.eyebrow{color:var(--accent);font-weight:900;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+h2{font-size:42px;line-height:1.1;margin-bottom:14px;letter-spacing:-1.5px}.lead{color:var(--muted);font-size:17px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:linear-gradient(145deg,#0e2136,#0a1929);border:1px solid var(--line);padding:28px;border-radius:18px;transition:.25s}.card:hover{transform:translateY(-5px);border-color:rgba(24,182,255,.4)}
+.icon{font-size:30px;margin-bottom:18px}.card h3{font-size:20px;margin-bottom:8px}.card p{color:var(--muted);font-size:14px}
+.projects{background:#081524}.project-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.project{min-height:250px;border-radius:18px;overflow:hidden;border:1px solid var(--line);position:relative;background:linear-gradient(135deg,#123554,#071522);padding:25px;display:flex;flex-direction:column;justify-content:flex-end}.project:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(0,0,0,.85));}.project>*{position:relative;z-index:1}.tag{display:inline-block;font-size:11px;color:#8be2ff;margin-bottom:8px;text-transform:uppercase;font-weight:800;letter-spacing:1px}.project h3{font-size:20px}
+.about{display:grid;grid-template-columns:.85fr 1.15fr;gap:55px;align-items:center}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:25px}.stat{padding:22px;border:1px solid var(--line);border-radius:15px;background:#0c1d30}.stat strong{font-size:30px;display:block;color:var(--accent)}
+.quote{background:linear-gradient(135deg,#0d2c46,#082035);border:1px solid rgba(24,182,255,.25);border-radius:25px;padding:45px;display:grid;grid-template-columns:1fr .8fr;gap:40px;align-items:center}.form{display:grid;gap:12px}.form input,.form select,.form textarea{width:100%;background:#061421;border:1px solid var(--line);border-radius:9px;padding:13px;color:#fff;font:inherit}.form textarea{min-height:110px;resize:vertical}
+footer{border-top:1px solid var(--line);padding:35px 0;color:var(--muted);font-size:13px}.footer{display:flex;justify-content:space-between;gap:20px}
+.whatsapp{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#25d366;color:#fff;font-size:26px;font-weight:900;z-index:30;box-shadow:0 12px 30px rgba(37,211,102,.25)}
+@media(max-width:850px){.links{display:none}.hero,.about,.quote{grid-template-columns:1fr}.visual{height:350px}.cards,.project-grid{grid-template-columns:1fr}.hero{padding-top:125px}h1{letter-spacing:-2px}.footer{flex-direction:column}}
+</style>
+</head>
+<body>
+<nav><div class="container nav">
+  <a class="logo" href="#">SEA<span>IRE</span></a>
+  <div class="links"><a href="#inicio">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
+  <a class="cta" href="#cotizacion">Contáctanos</a>
+</div></nav>
+
+<main>
+<section class="hero container" id="inicio">
+  <div>
+    <div class="badge">Ingeniería • Automatización • Energía</div>
+    <h1>Soluciones eléctricas para <span>proyectos reales.</span></h1>
+    <p>Diseñamos, construimos y mantenemos soluciones eléctricas, industriales, residenciales y especiales con enfoque técnico, seguridad y confiabilidad.</p>
+    <div class="actions"><a class="cta" href="#cotizacion">Solicitar cotización</a><a class="secondary" href="#servicios">Explorar servicios →</a></div>
+  </div>
+  <div class="visual"><div class="grid"></div><div class="orbit"></div><div class="core">⚡</div><i class="node n1"></i><i class="node n2"></i><i class="node n3"></i><i class="node n4"></i></div>
+</section>
+
+<section id="servicios"><div class="container">
+  <div class="section-head"><div class="eyebrow">Qué hacemos</div><h2>Ingeniería que conecta energía, control y tecnología.</h2><p class="lead">Un portafolio pensado para atender proyectos desde el diseño y la construcción hasta el mantenimiento y la puesta en servicio.</p></div>
+  <div class="cards">
+    <article class="card"><div class="icon">⚡</div><h3>Ingeniería eléctrica</h3><p>Diseño de redes MT/BT, instalaciones eléctricas, estudios, memorias técnicas y soluciones para infraestructura.</p></article>
+    <article class="card"><div class="icon">🏭</div><h3>Automatización industrial</h3><p>Tableros de control, variadores, motores, instrumentación y soluciones de automatización.</p></article>
+    <article class="card"><div class="icon">🔧</div><h3>Mantenimiento</h3><p>Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio de equipos eléctricos.</p></article>
+    <article class="card"><div class="icon">☀️</div><h3>Energía solar</h3><p>Diseño e implementación de sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.</p></article>
+    <article class="card"><div class="icon">🔌</div><h3>Transformadores</h3><p>Instalación, mantenimiento, pruebas y soluciones asociadas a transformadores y sistemas de distribución.</p></article>
+    <article class="card"><div class="icon">📐</div><h3>Asesoría técnica</h3><p>Evaluación de proyectos, especificaciones, presupuestos, documentación técnica y acompañamiento profesional.</p></article>
+  </div>
+</div></section>
+
+<section class="projects" id="proyectos"><div class="container">
+  <div class="section-head"><div class="eyebrow">Proyectos</div><h2>Experiencia aplicada al campo.</h2><p class="lead">Esta sección queda preparada para incorporar fotografías, planos, fichas técnicas y resultados de cada proyecto ejecutado.</p></div>
+  <div class="project-grid">
+    <article class="project"><span class="tag">Distribución eléctrica</span><h3>Repotenciación de sistema eléctrico</h3><p>Soluciones de transformación y distribución para infraestructura institucional.</p></article>
+    <article class="project"><span class="tag">Redes MT / BT</span><h3>Electrificación de comunidades</h3><p>Diseño y ampliación de redes para nuevos usuarios.</p></article>
+    <article class="project"><span class="tag">Automatización</span><h3>Sistemas de control industrial</h3><p>Integración de motores, variadores y tableros de control.</p></article>
+  </div>
+</div></section>
+
+<section id="nosotros"><div class="container about">
+  <div><div class="eyebrow">SEAIRE</div><h2>Una empresa enfocada en soluciones eléctricas.</h2><p class="lead">SEAIRE INGENIERÍA ELÉCTRICA S.A.S. integra ingeniería, ejecución y servicio técnico para resolver necesidades eléctricas y de automatización.</p><div class="stats"><div class="stat"><strong>01</strong>Diseño técnico</div><div class="stat"><strong>02</strong>Ejecución</div><div class="stat"><strong>03</strong>Pruebas</div><div class="stat"><strong>04</strong>Puesta en servicio</div></div></div>
+  <div class="card"><h3>Trabajamos con enfoque integral</h3><p>Desde la identificación de la necesidad hasta la entrega de una solución operativa. La web también podrá crecer con un catálogo, sistema de clientes, seguimiento de proyectos y generación de cotizaciones.</p><br><a class="cta" href="#cotizacion">Quiero una solución</a></div>
+</div></section>
+
+<section id="cotizacion"><div class="container">
+  <div class="quote"><div><div class="eyebrow">Cotizaciones</div><h2>Cuéntanos qué necesitas.</h2><p class="lead">Envíanos los datos básicos del proyecto y prepararemos el siguiente paso.</p></div>
+  <form class="form" id="quoteForm">
+    <input name="nombre" required placeholder="Nombre / Empresa"><input name="telefono" required type="tel" placeholder="Teléfono / WhatsApp"><input name="correo" required type="email" placeholder="Correo electrónico">
+    <select name="servicio"><option>Seleccione un servicio</option><option>Ingeniería eléctrica</option><option>Automatización industrial</option><option>Mantenimiento</option><option>Energía solar</option><option>Transformadores</option><option>Otro</option></select>
+    <textarea name="detalle" placeholder="Describa brevemente su proyecto"></textarea><button class="cta" type="submit">Enviar solicitud</button>
+  </form></div>
+</div></section>
+
+<section id="contacto">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Contacto</div>
+      <h2>Hablemos de tu proyecto.</h2>
+      <p class="lead">Atención directa para requerimientos de ingeniería eléctrica, automatización, mantenimiento y energía.</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="icon">📱</div>
+        <h3>WhatsApp</h3>
+        <p><a href="https://wa.me/593989020845" target="_blank">098 902 0845</a></p>
+      </article>
+      <article class="card">
+        <div class="icon">✉️</div>
+        <h3>Correo</h3>
+        <p><a href="mailto:seaire.gere@gmail.com">seaire.gere@gmail.com</a></p>
+      </article>
+      <article class="card">
+        <div class="icon">⚡</div>
+        <h3>SEAIRE</h3>
+        <p>Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales.</p>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="container footer"><div><strong style="color:#fff">SEAIRE INGENIERÍA ELÉCTRICA S.A.S.</strong><br>Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales.</div><div>WhatsApp: 098 902 0845 · seaire.gere@gmail.com<br>© 2026 SEAIRE. Todos los derechos reservados.</div></div></footer>
+<a class="whatsapp" href="https://wa.me/593989020845?text=Hola%20SEAIRE%2C%20quiero%20solicitar%20una%20cotizaci%C3%B3n." target="_blank" aria-label="WhatsApp">✆</a>
+<script>
+const form=document.getElementById("quoteForm");
+form.addEventListener("submit",function(e){
+  e.preventDefault();
+  const d=new FormData(form);
+  const msg=`Hola SEAIRE, quiero solicitar una cotización.%0A%0ANombre/Empresa: ${encodeURIComponent(d.get("nombre"))}%0ATeléfono: ${encodeURIComponent(d.get("telefono"))}%0ACorreo: ${encodeURIComponent(d.get("correo"))}%0AServicio: ${encodeURIComponent(d.get("servicio")||"No especificado")}%0ADetalle: ${encodeURIComponent(d.get("detalle")||"")}`;
+  window.open("https://wa.me/593989020845?text="+msg,"_blank");
+});
+</script></body></html>
