@@ -69,12 +69,28 @@ section{padding-top:42px!important;padding-bottom:42px!important}
 .about-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#18a8ff,#00d6b4);color:#071522;font-weight:900;margin-bottom:18px}
 @media(max-width:900px){.about-grid{grid-template-columns:1fr}.hero{padding-top:36px!important;padding-bottom:36px!important}}
 
+
+.service-card{cursor:pointer;position:relative;overflow:hidden}
+.service-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 10%,rgba(24,182,255,.12),transparent 34%);opacity:0;transition:.25s}
+.service-card:hover:before{opacity:1}.service-card>*{position:relative;z-index:1}
+.view-work{display:inline-block;margin-top:18px;color:#7dd8ff;font-size:13px;font-weight:800;letter-spacing:.2px}
+.gallery-modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+.gallery-modal.open{display:flex}.gallery-backdrop{position:absolute;inset:0;background:rgba(2,8,15,.82);backdrop-filter:blur(10px)}
+.gallery-dialog{position:relative;width:min(1050px,96vw);max-height:90vh;overflow:auto;background:linear-gradient(145deg,#102943,#071522);border:1px solid rgba(24,182,255,.25);border-radius:24px;padding:34px;box-shadow:0 35px 100px rgba(0,0,0,.55)}
+.gallery-close{position:absolute;right:18px;top:14px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#081725;color:#fff;font-size:28px;cursor:pointer}
+.gallery-header{padding-right:55px;margin-bottom:22px}.gallery-header h2{margin-bottom:8px}.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gallery-item{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#081725;cursor:pointer;transition:.2s}.gallery-item:hover{transform:translateY(-3px);border-color:rgba(24,182,255,.45)}
+.gallery-media{height:180px;display:grid;place-items:center;background:linear-gradient(135deg,#123a59,#071522);font-size:46px;position:relative}.gallery-media span{font-size:12px;position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.5);padding:5px 8px;border-radius:7px;color:#d8efff}
+.gallery-item-body{padding:15px}.gallery-item-body strong{display:block;margin-bottom:4px}.gallery-item-body small{color:var(--muted)}
+.gallery-note{margin-top:18px;color:#8fa7bd;font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+.media-viewer{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);padding:30px}.media-viewer.open{display:flex}.media-viewer-content{max-width:min(1100px,94vw);max-height:88vh;text-align:center}.media-viewer-content .viewer-placeholder{width:min(900px,90vw);height:min(620px,75vh);border-radius:18px;background:linear-gradient(135deg,#123a59,#071522);display:grid;place-items:center;font-size:90px;border:1px solid rgba(24,182,255,.3)}.viewer-title{margin-top:12px;font-weight:800}.viewer-close{position:fixed;right:25px;top:20px;width:46px;height:46px;border-radius:50%;border:1px solid #456;background:#081725;color:#fff;font-size:30px;cursor:pointer}
+@media(max-width:850px){.gallery-grid{grid-template-columns:1fr}.gallery-dialog{padding:24px}.gallery-media{height:210px}}
 </style>
 </head>
 <body>
 <nav><div class="container nav">
   <a class="logo" href="#">SEA<span>IRE</span></a>
-  <div class="links"><a href="#inicio">Inicio</a><a href="#nosotros">Nosotros</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
+  <div class="links"><a href="#inicio">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
   <a class="cta" href="#cotizacion">Contáctanos</a>
 </div></nav>
 
@@ -94,43 +110,15 @@ section{padding-top:42px!important;padding-bottom:42px!important}
 </div>
 </section>
 
-<section id="nosotros" class="institutional">
-  <div class="container">
-    <div class="section-head">
-      <div class="eyebrow">Conócenos</div>
-      <h2>Quiénes somos, nuestra misión y nuestra visión.</h2>
-      <p class="lead">Ingeniería, automatización y energía con una visión de crecimiento sostenible y servicio técnico especializado.</p>
-    </div>
-    <div class="about-grid">
-      <article class="about-card about-main">
-        <div class="about-icon">S</div>
-        <h3>¿Quiénes somos?</h3>
-        <p>Somos una empresa comprometida con el desarrollo de soluciones eléctricas, automatizaciones industriales, residenciales y especiales. Trabajamos con enfoque técnico y humano para cumplir estándares de calidad, seguridad, innovación y responsabilidad, aportando al bienestar de nuestros clientes y al desarrollo sostenible de la región.</p>
-      </article>
-      <article class="about-card">
-        <div class="about-icon">M</div>
-        <h3>Misión</h3>
-        <p>Brindar soluciones eléctricas y de automatización con calidad, seguridad e innovación, generando confianza y satisfacción en nuestros clientes.</p>
-      </article>
-      <article class="about-card">
-        <div class="about-icon">V</div>
-        <h3>Visión</h3>
-        <p>Ser una empresa referente en soluciones eléctricas y automatización en la región, reconocida por su profesionalismo y aporte al desarrollo.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-
 <section id="servicios"><div class="container">
   <div class="section-head"><div class="eyebrow">Qué hacemos</div><h2>Ingeniería que conecta energía, control y tecnología.</h2><p class="lead">Un portafolio pensado para atender proyectos desde el diseño y la construcción hasta el mantenimiento y la puesta en servicio.</p></div>
-  <div class="cards">
-    <article class="card"><div class="icon">⚡</div><h3>Ingeniería eléctrica</h3><p>Diseño de redes MT/BT, instalaciones eléctricas, estudios, memorias técnicas y soluciones para infraestructura.</p></article>
-    <article class="card"><div class="icon">🏭</div><h3>Automatización industrial</h3><p>Tableros de control, variadores, motores, instrumentación y soluciones de automatización.</p></article>
-    <article class="card"><div class="icon">🔧</div><h3>Mantenimiento</h3><p>Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio de equipos eléctricos.</p></article>
-    <article class="card"><div class="icon">☀️</div><h3>Energía solar</h3><p>Diseño e implementación de sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.</p></article>
-    <article class="card"><div class="icon">🔌</div><h3>Transformadores</h3><p>Instalación, mantenimiento, pruebas y soluciones asociadas a transformadores y sistemas de distribución.</p></article>
-    <article class="card"><div class="icon">📐</div><h3>Asesoría técnica</h3><p>Evaluación de proyectos, especificaciones, presupuestos, documentación técnica y acompañamiento profesional.</p></article>
+  <div class="cards service-cards">
+    <article class="card service-card" data-service="ingenieria"><div class="icon">⚡</div><h3>Ingeniería eléctrica</h3><p>Diseño de redes MT/BT, instalaciones eléctricas, estudios, memorias técnicas y soluciones para infraestructura.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="automatizacion"><div class="icon">🏭</div><h3>Automatización industrial</h3><p>Tableros de control, variadores, motores, instrumentación y soluciones de automatización.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="mantenimiento"><div class="icon">🔧</div><h3>Mantenimiento</h3><p>Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio de equipos eléctricos.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="solar"><div class="icon">☀️</div><h3>Energía solar</h3><p>Diseño e implementación de sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="transformadores"><div class="icon">🔌</div><h3>Transformadores</h3><p>Instalación, mantenimiento, pruebas y soluciones asociadas a transformadores y sistemas de distribución.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="asesoria"><div class="icon">📐</div><h3>Asesoría técnica</h3><p>Evaluación de proyectos, especificaciones, presupuestos, documentación técnica y acompañamiento profesional.</p><span class="view-work">Ver trabajos →</span></article>
   </div>
 </div></section>
 
@@ -143,8 +131,48 @@ section{padding-top:42px!important;padding-bottom:42px!important}
   </div>
 </div></section>
 
+<section id="nosotros"><div class="container about">
+  <div><div class="eyebrow">SEAIRE</div><h2>Una empresa enfocada en soluciones eléctricas.</h2><p class="lead">SEAIRE INGENIERÍA ELÉCTRICA S.A.S. integra ingeniería, ejecución y servicio técnico para resolver necesidades eléctricas y de automatización.</p><div class="stats"><div class="stat"><strong>01</strong>Diseño técnico</div><div class="stat"><strong>02</strong>Ejecución</div><div class="stat"><strong>03</strong>Pruebas</div><div class="stat"><strong>04</strong>Puesta en servicio</div></div></div>
+  <div class="card"><h3>Trabajamos con enfoque integral</h3><p>Desde la identificación de la necesidad hasta la entrega de una solución operativa. La web también podrá crecer con un catálogo, sistema de clientes, seguimiento de proyectos y generación de cotizaciones.</p><br><a class="cta" href="#cotizacion">Quiero una solución</a></div>
+</div></section>
 
 
+<section id="nosotros" class="institutional">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Quiénes somos</div>
+      <h2>Ingeniería que transforma ideas en soluciones.</h2>
+    </div>
+    <div class="about-grid">
+      <article class="about-card about-main">
+        <h3>¿Quiénes somos?</h3>
+        <p>
+          Somos una empresa comprometida con el desarrollo de soluciones eléctricas,
+          automatizaciones industriales, residenciales y especiales. Trabajamos con
+          enfoque técnico y humano para cumplir estándares de calidad, seguridad,
+          innovación y responsabilidad, aportando al bienestar de nuestros clientes
+          y al desarrollo sostenible de la región.
+        </p>
+      </article>
+      <article class="about-card">
+        <div class="about-icon">M</div>
+        <h3>Misión</h3>
+        <p>
+          Brindar soluciones eléctricas y de automatización con calidad, seguridad
+          e innovación, generando confianza y satisfacción en nuestros clientes.
+        </p>
+      </article>
+      <article class="about-card">
+        <div class="about-icon">V</div>
+        <h3>Visión</h3>
+        <p>
+          Ser una empresa referente en soluciones eléctricas y automatización en
+          la región, reconocida por su profesionalismo y aporte al desarrollo.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
 
 <section id="cotizacion"><div class="container">
   <div class="quote"><div><div class="eyebrow">Cotizaciones</div><h2>Cuéntanos qué necesitas.</h2><p class="lead">Envíanos los datos básicos del proyecto y prepararemos el siguiente paso.</p></div>
@@ -181,6 +209,20 @@ section{padding-top:42px!important;padding-bottom:42px!important}
     </div>
   </div>
 </section>
+
+<div class="gallery-modal" id="galleryModal" aria-hidden="true">
+  <div class="gallery-backdrop" data-close-gallery></div>
+  <div class="gallery-dialog" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <button class="gallery-close" type="button" data-close-gallery aria-label="Cerrar">×</button>
+    <div class="gallery-header">
+      <div class="eyebrow" id="galleryEyebrow">Trabajos realizados</div>
+      <h2 id="galleryTitle">Galería SEAIRE</h2>
+      <p id="galleryDescription" class="lead"></p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="gallery-note">Las fotografías y videos de cada servicio podrán ser administrados posteriormente desde el panel de SEAIRE.</div>
+  </div>
+</div>
 </main>
 
 <footer><div class="container footer"><div><strong style="color:#fff">SEAIRE INGENIERÍA ELÉCTRICA S.A.S.</strong><br>Soluciones Eléctricas, Automatizaciones Industriales, Residenciales y Especiales.</div><div>WhatsApp: 098 902 0845 · seaire.gere@gmail.com<br>© 2026 SEAIRE. Todos los derechos reservados.</div></div></footer>
@@ -193,4 +235,28 @@ form.addEventListener("submit",function(e){
   const msg=`Hola SEAIRE, quiero solicitar una cotización.%0A%0ANombre/Empresa: ${encodeURIComponent(d.get("nombre"))}%0ATeléfono: ${encodeURIComponent(d.get("telefono"))}%0ACorreo: ${encodeURIComponent(d.get("correo"))}%0AServicio: ${encodeURIComponent(d.get("servicio")||"No especificado")}%0ADetalle: ${encodeURIComponent(d.get("detalle")||"")}`;
   window.open("https://wa.me/593989020845?text="+msg,"_blank");
 });
-</script></body></html>
+</script>
+<div class="media-viewer" id="mediaViewer" aria-hidden="true">
+  <button class="viewer-close" id="viewerClose" type="button" aria-label="Cerrar">×</button>
+  <div class="media-viewer-content"><div class="viewer-placeholder" id="viewerPlaceholder">📷</div><div class="viewer-title" id="viewerTitle"></div></div>
+</div>
+<script>
+const galleryData={
+  ingenieria:{title:'Ingeniería eléctrica',description:'Redes MT/BT, instalaciones, diseño, estudios y ejecución de soluciones eléctricas.',items:[['Repotenciación eléctrica','Transformación y distribución','⚡'],['Red MT / BT','Diseño y construcción de redes','🔌'],['Instalaciones eléctricas','Montaje y puesta en servicio','🏗️']]},
+  automatizacion:{title:'Automatización industrial',description:'Tableros, variadores, motores, control e instrumentación.',items:[['Tablero de control','Integración de control','🏭'],['Variadores de velocidad','Control de motores','⚙️'],['Automatización de procesos','Programación e integración','🎛️']]},
+  mantenimiento:{title:'Mantenimiento',description:'Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio.',items:[['Mantenimiento preventivo','Inspección y mantenimiento','🔧'],['Pruebas eléctricas','Diagnóstico y verificación','🧪'],['Puesta en servicio','Arranque y comprobación','✅']]},
+  solar:{title:'Energía solar',description:'Sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.',items:[['Sistema fotovoltaico','Paneles e inversores','☀️'],['Almacenamiento','Baterías y respaldo','🔋'],['Estación solar','Soluciones modulares','🌞']]},
+  transformadores:{title:'Transformadores',description:'Instalación, mantenimiento, pruebas y soluciones para sistemas de distribución.',items:[['Transformador de potencia','Montaje y conexión','🔌'],['Transformador trifásico','Instalación y pruebas','⚡'],['Trafomix','Medición y protección','📊']]},
+  asesoria:{title:'Asesoría técnica',description:'Evaluación de proyectos, especificaciones, presupuestos y documentación técnica.',items:[['Diseño de proyecto','Ingeniería y documentación','📐'],['Memoria técnica','Cálculos y especificaciones','📄'],['Supervisión técnica','Acompañamiento profesional','👷']]}
+};
+const galleryModal=document.getElementById('galleryModal'),galleryGrid=document.getElementById('galleryGrid'),galleryTitle=document.getElementById('galleryTitle'),galleryDescription=document.getElementById('galleryDescription');
+const mediaViewer=document.getElementById('mediaViewer'),viewerPlaceholder=document.getElementById('viewerPlaceholder'),viewerTitle=document.getElementById('viewerTitle');
+function openGallery(key){const d=galleryData[key];galleryTitle.textContent=d.title;galleryDescription.textContent=d.description;galleryGrid.innerHTML=d.items.map((x,i)=>`<article class="gallery-item" data-index="${i}"><div class="gallery-media">${x[2]}<span>Galería multimedia</span></div><div class="gallery-item-body"><strong>${x[0]}</strong><small>${x[1]}</small></div></article>`).join('');galleryModal.classList.add('open');galleryModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';galleryGrid.querySelectorAll('.gallery-item').forEach((el,i)=>el.addEventListener('click',()=>openViewer(d.items[i])))}
+function closeGallery(){galleryModal.classList.remove('open');galleryModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+function openViewer(item){viewerPlaceholder.textContent=item[2];viewerTitle.textContent=item[0]+' — '+item[1];mediaViewer.classList.add('open');mediaViewer.setAttribute('aria-hidden','false')}
+function closeViewer(){mediaViewer.classList.remove('open');mediaViewer.setAttribute('aria-hidden','true')}
+document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>openGallery(card.dataset.service)));
+document.querySelectorAll('[data-close-gallery]').forEach(el=>el.addEventListener('click',closeGallery));document.getElementById('viewerClose').addEventListener('click',closeViewer);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeViewer();closeGallery()}});
+</script>
+</body></html>
