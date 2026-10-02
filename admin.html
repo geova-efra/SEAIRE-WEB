@@ -3,176 +3,223 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SEAIRE | Panel Administrativo</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./config.js"></script>
+<title>SEAIRE | Administración de proyectos</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#071522;color:#eef6ff}
-.app{display:flex;min-height:100vh}.side{width:250px;background:#06111d;border-right:1px solid #18344c;padding:22px}
-.logo{font-weight:900;font-size:26px;letter-spacing:2px;margin-bottom:30px;color:#22b8ff}
-.nav button{width:100%;padding:13px 14px;margin:5px 0;border:0;border-radius:10px;text-align:left;background:transparent;color:#b9cce0;cursor:pointer}
-.nav button.active,.nav button:hover{background:#12314b;color:#fff}.main{flex:1;padding:28px;max-width:1250px}
-.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}.top h1{margin:0;font-size:28px}.btn{border:0;border-radius:10px;padding:11px 15px;background:#149ff0;color:#fff;font-weight:700;cursor:pointer}.btn.secondary{background:#17344d}
-.card{background:#0d2438;border:1px solid #1c3b53;border-radius:16px;padding:22px;margin-bottom:18px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.metric{font-size:30px;font-weight:800;margin-top:8px}
-label{display:block;font-size:13px;color:#9eb5c9;margin:12px 0 6px}input,textarea,select{width:100%;padding:12px;border-radius:9px;border:1px solid #2a4960;background:#071a2b;color:#fff}textarea{min-height:110px}
-table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid #1c3b53;text-align:left;vertical-align:top}th{color:#9eb5c9;font-size:13px}
-.hidden{display:none}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.actions{display:flex;gap:8px;margin-top:16px}.status{display:inline-block;padding:4px 9px;border-radius:99px;background:#123e4a;color:#64f2d0;font-size:12px}
-#login{max-width:420px;margin:10vh auto}.danger{background:#7b2530}.muted{color:#9eb5c9}
-@media(max-width:850px){.side{width:75px;padding:12px}.side .nav span{display:none}.logo{font-size:18px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.main{padding:18px}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#07111f;color:#f5f8fc}
+input,textarea,select,button{font:inherit}
+.top{height:70px;border-bottom:1px solid #183650;padding:0 4%;display:flex;align-items:center;justify-content:space-between;background:#07111f;position:sticky;top:0;z-index:5}
+.brand{font-size:24px;font-weight:900;letter-spacing:2px}.brand span{color:#18b6ff}.top a{color:#b9cad9;text-decoration:none}
+.wrap{width:min(1150px,94%);margin:28px auto}.panel{background:#0b1d30;border:1px solid #183650;border-radius:18px;padding:25px}
+.login{max-width:430px;margin:70px auto}.hidden{display:none}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.primary{background:#18b6ff;color:#061522;border:0;padding:11px 16px;border-radius:9px;font-weight:900;cursor:pointer}
+.secondary,.danger{background:#102940;color:#fff;border:1px solid #24445d;padding:9px 12px;border-radius:8px;cursor:pointer}
+.danger{color:#ffb0b0}.form{display:grid;gap:13px;margin-top:20px}.form label{font-size:13px;color:#b1c1d0}
+.form input,.form select,.form textarea{width:100%;margin-top:6px;background:#061522;color:#fff;border:1px solid #24445d;border-radius:8px;padding:11px}
+.form textarea{min-height:120px;resize:vertical}.list{display:grid;gap:12px;margin-top:20px}
+.item{display:grid;grid-template-columns:100px 1fr auto;gap:14px;align-items:center;padding:14px;background:#0d2237;border:1px solid #1b3a53;border-radius:13px}
+.thumb{height:78px;background:#11304a;border-radius:8px;overflow:hidden;display:grid;place-items:center;font-size:28px}.thumb img{width:100%;height:100%;object-fit:cover}
+.item small{color:#90a8bb}.actions{display:flex;gap:7px;flex-wrap:wrap}.status{display:inline-block;margin-top:5px;font-size:11px;padding:4px 7px;border-radius:99px;background:#17364d;color:#7ddcff}
+.preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.preview-item{position:relative;width:120px}
+.preview-item img{width:120px;height:82px;object-fit:cover;border-radius:8px;border:1px solid #24445d}.remove{position:absolute;right:3px;top:3px;border:0;background:#061522dd;color:#fff;border-radius:50%;width:23px;height:23px;cursor:pointer}
+.video-preview{margin-top:10px;color:#8fb1c7;font-size:13px}.msg{margin:10px 0;color:#ffb3b3;white-space:pre-wrap}.ok{color:#7ff0c2}
+.help{padding:12px;background:#0e2539;border-radius:8px;color:#9fb3c5;font-size:12px;line-height:1.5}
+.check{display:flex!important;align-items:center;gap:8px}.check input{width:auto!important;margin:0!important}
+@media(max-width:760px){.item{grid-template-columns:70px 1fr}.actions{grid-column:1/-1}.head{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
-<div id="login" class="card">
-  <div class="logo">SEAIRE</div>
-  <h1>Panel administrativo</h1>
-  <p class="muted">Acceso para administrar contenido, proyectos, servicios y cotizaciones.</p>
-  <label>Correo</label><input id="email" type="email" placeholder="administracion@seaire.com">
-  <label>Contraseña</label><input id="password" type="password">
-  <div class="actions"><button class="btn" onclick="login()">Ingresar</button></div>
-  <p id="loginMsg" class="muted"></p>
-</div>
+<header class="top">
+  <div class="brand">SEA<span>IRE</span> · ADMIN</div>
+  <div>
+    <a href="index.html">Ver página pública</a>
+    <button class="secondary" id="logout">Salir</button>
+  </div>
+</header>
 
-<div id="app" class="app hidden">
-  <aside class="side">
-    <div class="logo">SEAIRE</div>
-    <div class="nav">
-      <button class="active" onclick="show('dashboard',this)">▦ <span>Dashboard</span></button>
-      <button onclick="show('empresa',this)">◉ <span>Empresa</span></button>
-      <button onclick="show('servicios',this)">⚡ <span>Servicios</span></button>
-      <button onclick="show('proyectos',this)">▣ <span>Proyectos</span></button>
-      <button onclick="show('cotizaciones',this)">✉ <span>Cotizaciones</span></button>
+<div class="wrap">
+  <div id="login" class="panel login hidden">
+    <h2>Acceso administrativo</h2>
+    <p style="color:#aebfd0">Solo el usuario autorizado puede publicar proyectos.</p>
+    <form id="loginForm" class="form">
+      <label>Correo<input id="email" type="email" required></label>
+      <label>Contraseña<input id="password" type="password" required></label>
+      <button class="primary">Ingresar</button>
+    </form>
+    <div id="loginMsg" class="msg"></div>
+  </div>
+
+  <div id="app" class="panel hidden">
+    <div class="head">
+      <div><div style="color:#18b6ff;font-size:12px;font-weight:900;letter-spacing:2px">ADMINISTRACIÓN</div><h1>Proyectos realizados</h1></div>
+      <button class="primary" onclick="newProject()">+ Agregar proyecto</button>
     </div>
-    <div style="position:fixed;bottom:18px"><button class="btn secondary" onclick="logout()">Salir</button></div>
-  </aside>
-  <main class="main">
-    <div class="top"><h1 id="title">Dashboard</h1><button class="btn" onclick="window.open('./','_blank')">Ver página</button></div>
+    <div id="msg" class="msg"></div>
+    <div id="list" class="list"></div>
 
-    <section id="dashboard">
-      <div class="grid">
-        <div class="card"><div class="muted">Servicios activos</div><div class="metric" id="mServices">—</div></div>
-        <div class="card"><div class="muted">Proyectos activos</div><div class="metric" id="mProjects">—</div></div>
-        <div class="card"><div class="muted">Cotizaciones nuevas</div><div class="metric" id="mInquiries">—</div></div>
-      </div>
-      <div class="card"><h2>Administración SEAIRE</h2><p class="muted">Desde aquí podrás actualizar el contenido de la página sin modificar el código.</p></div>
-    </section>
+    <div id="editor" class="hidden">
+      <hr style="border-color:#183650;margin:25px 0">
+      <h2 id="formTitle">Nuevo proyecto</h2>
+      <form id="form" class="form">
+        <input type="hidden" id="pid">
 
-    <section id="empresa" class="hidden">
-      <div class="card">
-        <h2>Información de la empresa</h2>
-        <div class="row">
-          <div><label>Nombre</label><input id="company_name"></div>
-          <div><label>WhatsApp</label><input id="whatsapp"></div>
-        </div>
-        <label>Eslogan / descripción corta</label><input id="tagline">
-        <label>Quiénes somos</label><textarea id="about_text"></textarea>
-        <label>Misión</label><textarea id="mission"></textarea>
-        <label>Visión</label><textarea id="vision"></textarea>
-        <div class="row">
-          <div><label>Correo</label><input id="email_company"></div>
-          <div><label>Dirección</label><input id="address"></div>
-        </div>
-        <div class="actions"><button class="btn" onclick="saveCompany()">Guardar cambios</button></div>
-      </div>
-    </section>
+        <label>Nombre del proyecto
+          <input id="title" required placeholder="Ej. Instalación de transformador trifásico 500 kVA">
+        </label>
 
-    <section id="servicios" class="hidden">
-      <div class="card">
-        <h2>Servicios</h2>
-        <div class="row">
-          <div><label>Título</label><input id="service_title"></div>
-          <div><label>Icono</label><input id="service_icon" placeholder="⚡"></div>
-        </div>
-        <label>Descripción</label><textarea id="service_description"></textarea>
-        <div class="actions"><button class="btn" onclick="addService()">Agregar servicio</button></div>
-      </div>
-      <div class="card"><table><thead><tr><th>Servicio</th><th>Descripción</th><th>Estado</th><th></th></tr></thead><tbody id="servicesTable"></tbody></table></div>
-    </section>
+        <label>Servicio
+          <select id="service">
+            <option>Ingeniería eléctrica</option>
+            <option>Automatización industrial</option>
+            <option>Mantenimiento</option>
+            <option>Energía solar</option>
+            <option>Transformadores</option>
+            <option>Asesoría técnica</option>
+          </select>
+        </label>
 
-    <section id="proyectos" class="hidden">
-      <div class="card">
-        <h2>Proyectos</h2>
-        <div class="row">
-          <div><label>Proyecto</label><input id="project_title"></div>
-          <div><label>Categoría</label><input id="project_category"></div>
-        </div>
-        <label>Descripción</label><textarea id="project_description"></textarea>
-        <div class="row">
-          <div><label>Ubicación</label><input id="project_location"></div>
-          <div><label>Año</label><input id="project_year" type="number" value="2026"></div>
-        </div>
-        <div class="actions"><button class="btn" onclick="addProject()">Agregar proyecto</button></div>
-      </div>
-      <div class="card"><table><thead><tr><th>Proyecto</th><th>Categoría</th><th>Ubicación</th><th>Estado</th><th></th></tr></thead><tbody id="projectsTable"></tbody></table></div>
-    </section>
+        <label>Ubicación<input id="location" placeholder="Ej. La Joya de los Sachas, Orellana"></label>
+        <label>Año<input id="year" type="number" value="2026"></label>
+        <label>Descripción<textarea id="description" placeholder="Alcance, trabajos ejecutados, equipos, resultados, etc."></textarea></label>
 
-    <section id="cotizaciones" class="hidden">
-      <div class="card"><h2>Solicitudes de cotización</h2><p class="muted">Aquí llegarán las solicitudes enviadas desde la página web.</p></div>
-      <div class="card"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Contacto</th><th>Servicio</th><th>Estado</th></tr></thead><tbody id="inquiriesTable"></tbody></table></div>
-    </section>
-  </main>
+        <label>Fotografías del proyecto
+          <input id="photoFiles" type="file" accept="image/*" multiple>
+          <div class="help">Selecciona una o varias fotografías. Se subirán a Supabase y quedarán disponibles públicamente.</div>
+          <div id="preview" class="preview"></div>
+        </label>
+
+        <label>Video del proyecto (opcional)
+          <input id="videoFile" type="file" accept="video/*">
+          <div id="videoPreview" class="video-preview"></div>
+        </label>
+
+        <label class="check"><input id="published" type="checkbox" checked> Publicar para todos los visitantes</label>
+
+        <div>
+          <button class="primary" type="submit" id="saveBtn">Guardar y publicar</button>
+          <button type="button" class="secondary" onclick="cancel()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
+<script src="supabase-config.js"></script>
 <script>
-const cfg=window.SEAIRE_CONFIG||{};
-const ready=cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes("TU-PROYECTO") && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes("TU_ANON_KEY");
-let sb=null;
-if(ready) sb=supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+let client=null, currentImages=[], currentVideo=null;
 
-async function login(){
-  if(!sb){document.getElementById('loginMsg').textContent='Primero configura Supabase en config.js';return}
-  const email=document.getElementById('email').value,password=document.getElementById('password').value;
-  const {error}=await sb.auth.signInWithPassword({email,password});
-  document.getElementById('loginMsg').textContent=error?error.message:'';
-  if(!error) start();
+const $ = id => document.getElementById(id);
+function waitForClient(){
+  return new Promise(resolve=>{
+    const t=setInterval(()=>{
+      if(window.seaireSupabase){clearInterval(t);resolve(window.seaireSupabase)}
+    },50);
+  });
 }
-async function start(){
-  document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');await loadAll();
+function showMessage(text,ok=false){$("msg").textContent=text;$("msg").className="msg "+(ok?"ok":"")}
+function safe(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function init(){
+  client=await waitForClient();
+  const {data}=await client.auth.getSession();
+  if(data.session) showApp(); else $("login").classList.remove("hidden");
 }
-async function logout(){if(sb) await sb.auth.signOut();location.reload()}
-function show(id,btn){
-  document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
-  document.getElementById('title').textContent=btn.innerText.trim();
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault(); $("loginMsg").textContent="";
+  const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});
+  if(error)$("loginMsg").textContent="No se pudo iniciar sesión: "+error.message; else showApp();
+});
+$("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
+
+async function showApp(){$("login").classList.add("hidden");$("app").classList.remove("hidden");await render()}
+async function render(){
+  const {data,error}=await client.from("projects").select("*").order("created_at",{ascending:false});
+  if(error){showMessage(error.message);return}
+  $("list").innerHTML=(data||[]).map(p=>`
+    <div class="item">
+      <div class="thumb">${p.cover_url?`<img src="${p.cover_url}" alt="">`:"⚡"}</div>
+      <div><b>${safe(p.title)}</b><br><small>${safe(p.service)} · ${safe(p.location||"")} · ${p.year||""}</small><br>
+      <span class="status">${p.published?"PUBLICADO":"BORRADOR"}</span></div>
+      <div class="actions">
+        <button class="secondary" onclick="editProject('${p.id}')">Editar</button>
+        <button class="danger" onclick="deleteProject('${p.id}')">Eliminar</button>
+      </div>
+    </div>`).join("") || '<div class="help">No hay proyectos todavía. Pulsa “Agregar proyecto”.</div>';
 }
-async function loadAll(){await loadCompany();await loadServices();await loadProjects();await loadInquiries()}
-async function loadCompany(){
-  const {data}=await sb.from('site_settings').select('*').limit(1).single(); if(!data)return;
-  for(const k of ['company_name','tagline','about_text','mission','vision','whatsapp','address']) document.getElementById(k).value=data[k]||'';
-  document.getElementById('email_company').value=data.email||'';
+
+function newProject(){
+  $("editor").classList.remove("hidden");$("form").reset();$("pid").value="";
+  $("year").value="2026";$("published").checked=true;currentImages=[];currentVideo=null;
+  renderPreview();$("videoPreview").textContent="";$("formTitle").textContent="Nuevo proyecto";
+  $("editor").scrollIntoView({behavior:"smooth"});
 }
-async function saveCompany(){
-  const {data}=await sb.from('site_settings').select('id').limit(1).single();
-  const payload={company_name:company_name.value,tagline:tagline.value,about_text:about_text.value,mission:mission.value,vision:vision.value,whatsapp:whatsapp.value,email:email_company.value,address:address.value};
-  const {error}=await sb.from('site_settings').update(payload).eq('id',data.id);alert(error?error.message:'Información guardada.');
+async function editProject(id){
+  const {data,error}=await client.from("projects").select("*").eq("id",id).single();
+  if(error){showMessage(error.message);return}
+  $("editor").classList.remove("hidden");$("pid").value=data.id;$("title").value=data.title;
+  $("service").value=data.service;$("location").value=data.location||"";$("year").value=data.year||"";
+  $("description").value=data.description||"";$("published").checked=!!data.published;
+  currentImages=Array.isArray(data.images)?data.images:[];currentVideo=data.video_url||null;
+  renderPreview();$("videoPreview").textContent=currentVideo?"Video actual: "+currentVideo:"";
+  $("formTitle").textContent="Editar proyecto";$("editor").scrollIntoView({behavior:"smooth"});
 }
-async function loadServices(){
-  const {data}=await sb.from('services').select('*').order('sort_order');document.getElementById('mServices').textContent=(data||[]).filter(x=>x.active).length;
-  servicesTable.innerHTML=(data||[]).map(x=>`<tr><td>${esc(x.title)}</td><td>${esc(x.description||'')}</td><td><span class="status">${x.active?'Activo':'Oculto'}</span></td><td><button class="btn danger" onclick="toggleService('${x.id}',${!x.active})">${x.active?'Ocultar':'Activar'}</button></td></tr>`).join('');
+function cancel(){$("editor").classList.add("hidden")}
+function renderPreview(){
+  $("preview").innerHTML=currentImages.map((url,i)=>`<div class="preview-item"><img src="${url}"><button class="remove" type="button" onclick="removeImage(${i})">×</button></div>`).join("");
 }
-async function addService(){
-  const payload={title:service_title.value,icon:service_icon.value,description:service_description.value,sort_order:0};
-  if(!payload.title)return alert('Escribe el título del servicio.');
-  const {error}=await sb.from('services').insert(payload);if(error)alert(error.message);else{service_title.value='';service_description.value='';await loadServices()}
+function removeImage(i){currentImages.splice(i,1);renderPreview()}
+function slug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9._-]+/g,"-").replace(/^-+|-+$/g,"")}
+
+async function uploadFile(file,folder){
+  const ext=(file.name.split(".").pop()||"bin").toLowerCase();
+  const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const {error}=await client.storage.from("project-media").upload(path,file,{upsert:false,contentType:file.type});
+  if(error) throw error;
+  const {data}=client.storage.from("project-media").getPublicUrl(path);
+  return data.publicUrl;
 }
-async function toggleService(id,val){await sb.from('services').update({active:val}).eq('id',id);loadServices()}
-async function loadProjects(){
-  const {data}=await sb.from('projects').select('*').order('created_at',{ascending:false});mProjects.textContent=(data||[]).filter(x=>x.active).length;
-  projectsTable.innerHTML=(data||[]).map(x=>`<tr><td>${esc(x.title)}</td><td>${esc(x.category||'')}</td><td>${esc(x.location||'')}</td><td><span class="status">${x.active?'Activo':'Oculto'}</span></td><td><button class="btn danger" onclick="toggleProject('${x.id}',${!x.active})">${x.active?'Ocultar':'Activar'}</button></td></tr>`).join('');
+$("photoFiles").addEventListener("change",async e=>{
+  const files=[...e.target.files]; if(!files.length)return;
+  $("saveBtn").disabled=true;
+  try{
+    for(const file of files){
+      if(file.size>15*1024*1024) throw new Error("Cada fotografía debe pesar menos de 15 MB.");
+      currentImages.push(await uploadFile(file,"photos"));
+    }
+    renderPreview();
+  }catch(err){showMessage("Error subiendo fotografía: "+err.message)}
+  finally{$("saveBtn").disabled=false}
+});
+$("videoFile").addEventListener("change",async e=>{
+  const file=e.target.files[0]; if(!file)return;
+  if(file.size>100*1024*1024){showMessage("El video debe pesar menos de 100 MB.");return}
+  $("saveBtn").disabled=true;
+  try{
+    currentVideo=await uploadFile(file,"videos");
+    $("videoPreview").textContent="Video listo para publicar.";
+  }catch(err){showMessage("Error subiendo video: "+err.message)}
+  finally{$("saveBtn").disabled=false}
+});
+
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault(); $("saveBtn").disabled=true; showMessage("Guardando proyecto...");
+  const obj={
+    title:$("title").value.trim(),service:$("service").value,location:$("location").value.trim(),
+    year:Number($("year").value)||null,description:$("description").value.trim(),
+    cover_url:currentImages[0]||null,video_url:currentVideo,images:currentImages,published:$("published").checked
+  };
+  const id=$("pid").value;
+  const result=id?await client.from("projects").update(obj).eq("id",id):await client.from("projects").insert(obj);
+  if(result.error){showMessage("No se pudo guardar: "+result.error.message)}
+  else{showMessage("Proyecto guardado correctamente.",true);cancel();await render()}
+  $("saveBtn").disabled=false;
+});
+async function deleteProject(id){
+  if(!confirm("¿Eliminar este proyecto de la página pública?"))return;
+  const {error}=await client.from("projects").delete().eq("id",id);
+  if(error)showMessage(error.message);else await render();
 }
-async function addProject(){
-  const payload={title:project_title.value,category:project_category.value,description:project_description.value,location:project_location.value,year:Number(project_year.value)||null};
-  if(!payload.title)return alert('Escribe el nombre del proyecto.');
-  const {error}=await sb.from('projects').insert(payload);if(error)alert(error.message);else{project_title.value='';project_description.value='';await loadProjects()}
-}
-async function toggleProject(id,val){await sb.from('projects').update({active:val}).eq('id',id);loadProjects()}
-async function loadInquiries(){
-  const {data}=await sb.from('inquiries').select('*').order('created_at',{ascending:false});mInquiries.textContent=(data||[]).filter(x=>x.status==='nueva').length;
-  inquiriesTable.innerHTML=(data||[]).map(x=>`<tr><td>${new Date(x.created_at).toLocaleString('es-EC')}</td><td>${esc(x.name)}</td><td>${esc(x.phone||'')}<br>${esc(x.email||'')}</td><td>${esc(x.service||'')}</td><td><span class="status">${esc(x.status)}</span></td></tr>`).join('');
-}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-if(ready){sb.auth.getSession().then(({data})=>{if(data.session)start()})}
+init();
 </script>
 </body>
 </html>
