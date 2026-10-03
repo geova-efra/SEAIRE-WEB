@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEAIRE | Panel Administrativo</title>
+<style>
+:root{--bg:#061321;--side:#06111d;--card:#0d263d;--line:rgba(100,190,240,.18);--text:#f5f8fc;--muted:#a8bdd1;--blue:#1aa8ff;--green:#00d9a6;--red:#e65364}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}
+.layout{min-height:100vh;display:grid;grid-template-columns:270px 1fr}.sidebar{background:var(--side);border-right:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column}.brand{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--blue);margin-bottom:40px}.nav button{display:block;width:100%;text-align:left;color:#dce7f2;background:none;border:0;padding:14px 16px;border-radius:12px;margin:5px 0;cursor:pointer}.nav button:hover,.nav button.active{background:#153753}.logout{margin-top:auto;background:#153753;border:0;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}
+.main{padding:34px;max-width:1450px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:15px}.top h1{font-size:34px;margin:0}.btn{border:0;border-radius:10px;padding:12px 18px;background:linear-gradient(135deg,var(--blue),#1684ff);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#153753}.btn.danger{background:#5b2430}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}.stat{padding:24px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:38px;margin-top:5px}.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px}.field textarea{min-height:110px;resize:vertical}.preview{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.table-wrap{overflow:auto}.projects-table{width:100%;border-collapse:collapse}.projects-table th,.projects-table td{text-align:left;padding:13px;border-bottom:1px solid var(--line);vertical-align:top}.projects-table th{color:#9fc0d9}.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}.thumb{width:80px;height:55px;object-fit:cover;border-radius:7px}.tab{display:none}.tab.active{display:block}.login{max-width:430px;margin:10vh auto;padding:30px}.login h1{margin-top:0}.status{margin:10px 0;padding:12px;border-radius:10px;background:#102d45;color:#b9cce0}.ok{border-color:rgba(0,217,166,.4)}.error{border-color:rgba(230,83,100,.5);color:#ffb5bf}.service-row{display:grid;grid-template-columns:100px 1fr 1fr 90px;gap:10px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}.service-row input{min-width:0}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{position:relative}.stats,.form-grid{grid-template-columns:1fr}.main{padding:20px}.field.full{grid-column:auto}.service-row{grid-template-columns:1fr}.top{align-items:flex-start}}
+</style></head>
+<body>
+<div id="loginView" class="login panel">
+  <h1>SEAIRE</h1><p style="color:#a8bdd1">Acceso al panel administrativo</p>
+  <form id="loginForm">
+    <div class="field"><label>Correo</label><input id="loginEmail" type="email" required placeholder="admin@seaire.com"></div><br>
+    <div class="field"><label>Contraseña</label><input id="loginPassword" type="password" required></div>
+    <div class="actions"><button class="btn" type="submit">Ingresar</button></div>
+  </form>
+  <div id="loginMsg" class="status"></div>
+</div>
+
+<div id="app" class="layout" style="display:none">
+<aside class="sidebar">
+  <div class="brand">SEAIRE</div>
+  <nav class="nav">
+    <button data-tab="dashboard" class="active">▦ Dashboard</button>
+    <button data-tab="empresa">◉ Empresa</button>
+    <button data-tab="servicios">⚡ Servicios</button>
+    <button data-tab="proyectos">▣ Proyectos</button>
+    <button data-tab="contacto">✉ Contacto</button>
+  </nav>
+  <button class="logout" id="publicBtn">Ver página pública</button><br>
+  <button class="logout" id="logoutBtn">Cerrar sesión</button>
+</aside>
+
+<main class="main">
+<section id="dashboard" class="tab active">
+  <div class="top"><h1>Dashboard</h1></div>
+  <div class="stats">
+    <div class="stat"><span>Servicios activos</span><strong id="serviceCount">0</strong></div>
+    <div class="stat"><span>Proyectos publicados</span><strong id="projectCount">0</strong></div>
+    <div class="stat"><span>Fotografías</span><strong id="mediaCount">0</strong></div>
+  </div>
+  <div class="panel"><h2>Administración SEAIRE</h2><p style="color:#a8bdd1">Los cambios se guardan en Supabase y se reflejan en la página pública para todos los visitantes.</p></div>
+</section>
+
+<section id="empresa" class="tab">
+  <div class="top"><h1>Empresa y página</h1><button class="btn" id="saveEmpresa">Guardar cambios</button></div>
+  <div class="panel">
+    <h2>Identidad</h2><div class="form-grid">
+      <div class="field"><label>Nombre legal</label><input id="eNombre"></div>
+      <div class="field"><label>Eslogan</label><input id="eEslogan"></div>
+      <div class="field"><label>Teléfono</label><input id="eTelefono"></div>
+      <div class="field"><label>Correo</label><input id="eCorreo"></div>
+      <div class="field full"><label>Logo URL pública (opcional)</label><input id="eLogo" placeholder="URL de Supabase Storage"></div>
+    </div>
+  </div>
+  <div class="panel"><h2>Inicio</h2><div class="form-grid">
+    <div class="field"><label>Etiqueta</label><input id="iBadge"></div>
+    <div class="field"><label>Título</label><input id="iTitulo"></div>
+    <div class="field"><label>Texto destacado</label><input id="iHighlight"></div>
+    <div class="field full"><label>Descripción</label><textarea id="iDescripcion"></textarea></div>
+  </div></div>
+  <div class="panel"><h2>Quiénes somos · Misión · Visión</h2><div class="form-grid">
+    <div class="field full"><label>Quiénes somos</label><textarea id="nQuienes"></textarea></div>
+    <div class="field"><label>Misión</label><textarea id="nMision"></textarea></div>
+    <div class="field"><label>Visión</label><textarea id="nVision"></textarea></div>
+  </div></div>
+</section>
+
+<section id="servicios" class="tab">
+  <div class="top"><h1>Servicios</h1><button class="btn" id="saveServices">Guardar servicios</button></div>
+  <div class="panel"><div id="servicesEditor"></div></div>
+</section>
+
+<section id="proyectos" class="tab">
+  <div class="top"><h1>Proyectos</h1><button class="btn" id="newProject">+ Nuevo proyecto</button></div>
+  <div class="stats">
+    <div class="stat"><span>Proyectos</span><strong id="pCount">0</strong></div>
+    <div class="stat"><span>Fotos</span><strong id="pPhotosCount">0</strong></div>
+    <div class="stat"><span>Videos</span><strong id="pVideos">0</strong></div>
+  </div>
+  <div class="panel" id="projectEditor">
+    <h2 id="formTitle">Nuevo proyecto</h2>
+    <form id="projectForm"><input type="hidden" id="projectId">
+      <div class="form-grid">
+        <div class="field"><label>Nombre del proyecto *</label><input id="pTitle" required></div>
+        <div class="field"><label>Servicio *</label><select id="pService" required></select></div>
+        <div class="field"><label>Ubicación</label><input id="pLocation"></div>
+        <div class="field"><label>Fecha</label><input id="pDate" type="date"></div>
+        <div class="field full"><label>Descripción</label><textarea id="pDescription"></textarea></div>
+        <div class="field"><label>Fotografías</label><input id="pPhotoFiles" type="file" accept="image/jpeg,image/png,image/webp" multiple><div id="pPreview" class="preview"></div></div>
+        <div class="field"><label>Video externo</label><input id="pVideo" placeholder="https://youtube.com/..."></div>
+      </div>
+      <div class="actions"><button type="button" class="btn secondary" id="clearProject">Limpiar</button><button class="btn">Guardar proyecto</button></div>
+    </form>
+  </div>
+  <div class="panel"><h2>Proyectos guardados</h2><div class="table-wrap"><table class="projects-table"><thead><tr><th>Proyecto</th><th>Servicio</th><th>Ubicación</th><th>Multimedia</th><th>Acciones</th></tr></thead><tbody id="projectRows"></tbody></table></div></div>
+</section>
+
+<section id="contacto" class="tab">
+  <div class="top"><h1>Contacto</h1><button class="btn" id="saveContacto">Guardar cambios</button></div>
+  <div class="panel"><div class="form-grid">
+    <div class="field"><label>WhatsApp</label><input id="cWhatsapp"></div>
+    <div class="field"><label>Correo</label><input id="cCorreo"></div>
+    <div class="field full"><label>Ubicación</label><input id="cUbicacion"></div>
+  </div></div>
+</section>
+</main></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="seaire-config.js"></script>
+<script>
+const sb=supabase.createClient(SEAIRE_CONFIG.SUPABASE_URL,SEAIRE_CONFIG.SUPABASE_ANON_KEY);
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+let services=[], projects=[], currentMedia=[], editingId=null;
+
+async function isAdmin(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user) return false;
+  const {data,error}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+  return !!data && !error;
+}
+function msg(text,ok=true){$('loginMsg').textContent=text;$('loginMsg').className='status '+(ok?'ok':'error')}
+async function start(){
+  if(await isAdmin()){$('loginView').style.display='none';$('app').style.display='grid';await loadAll()}
+}
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();msg('Ingresando…');
+  const {error}=await sb.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+  if(error){msg(error.message,false);return}
+  if(!await isAdmin()){await sb.auth.signOut();msg('Este usuario no está autorizado como administrador. Añade su UUID a public.admin_users.',false);return}
+  location.reload();
+};
+$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};
+$('publicBtn').onclick=()=>location.href='index.html';
+
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$(b.dataset.tab).classList.add('active');
+});
+
+async function loadAll(){await loadSettings();await loadServices();await loadProjects();}
+
+async function getSetting(section){
+  const {data,error}=await sb.from('site_settings').select('data').eq('section',section).maybeSingle();
+  if(error)throw error; return data?.data||{};
+}
+async function saveSetting(section,data){
+  const {error}=await sb.from('site_settings').upsert({section,data,updated_at:new Date().toISOString()},{onConflict:'section'});
+  if(error)throw error;
+}
+async function loadSettings(){
+  const [e,i,n,c]=await Promise.all([getSetting('empresa'),getSetting('inicio'),getSetting('nosotros'),getSetting('contacto')]);
+  $('eNombre').value=e.nombre||'';$('eEslogan').value=e.eslogan||'';$('eTelefono').value=e.telefono||'';$('eCorreo').value=e.correo||'';$('eLogo').value=e.logo||'';
+  $('iBadge').value=i.badge||'';$('iTitulo').value=i.titulo||'';$('iHighlight').value=i.highlight||'proyectos reales.';$('iDescripcion').value=i.descripcion||'';
+  $('nQuienes').value=n.quienes_somos||'';$('nMision').value=n.mision||'';$('nVision').value=n.vision||'';
+  $('cWhatsapp').value=c.whatsapp||e.telefono||'';$('cCorreo').value=c.correo||e.correo||'';$('cUbicacion').value=c.ubicacion||'';
+}
+$('saveEmpresa').onclick=async()=>{
+  try{
+    await saveSetting('empresa',{nombre:$('eNombre').value,eslogan:$('eEslogan').value,telefono:$('eTelefono').value,correo:$('eCorreo').value,logo:$('eLogo').value});
+    await saveSetting('inicio',{badge:$('iBadge').value,titulo:$('iTitulo').value,highlight:$('iHighlight').value,descripcion:$('iDescripcion').value});
+    await saveSetting('nosotros',{quienes_somos:$('nQuienes').value,mision:$('nMision').value,vision:$('nVision').value});
+    alert('Contenido de empresa, inicio y nosotros guardado en la nube.');
+  }catch(e){alert('Error al guardar: '+e.message)}
+};
+$('saveContacto').onclick=async()=>{
+  try{await saveSetting('contacto',{whatsapp:$('cWhatsapp').value,correo:$('cCorreo').value,ubicacion:$('cUbicacion').value});alert('Contacto guardado.')}
+  catch(e){alert('Error: '+e.message)}
+};
+
+async function loadServices(){
+  const {data,error}=await sb.from('services').select('*').order('sort_order');
+  if(error){alert(error.message);return}
+  services=data||[];$('serviceCount').textContent=services.filter(x=>x.active).length;
+  $('pService').innerHTML=services.map(s=>`<option value="${esc(s.id)}">${esc(s.icon)} ${esc(s.name)}</option>`).join('');
+  $('servicesEditor').innerHTML=services.map(s=>`<div class="service-row" data-s="${esc(s.id)}">
+    <input class="sIcon" value="${esc(s.icon)}"><input class="sName" value="${esc(s.name)}"><textarea class="sDesc">${esc(s.description)}</textarea>
+    <label><input class="sActive" type="checkbox" ${s.active?'checked':''}> Activo</label></div>`).join('');
+}
+$('saveServices').onclick=async()=>{
+  try{
+    for(const row of document.querySelectorAll('.service-row')){
+      const id=row.dataset.s;
+      const payload={icon:row.querySelector('.sIcon').value,name:row.querySelector('.sName').value,description:row.querySelector('.sDesc').value,active:row.querySelector('.sActive').checked,updated_at:new Date().toISOString()};
+      const {error}=await sb.from('services').update(payload).eq('id',id);if(error)throw error;
+    }
+    await loadServices();alert('Servicios guardados en Supabase.');
+  }catch(e){alert('Error: '+e.message)}
+};
+
+async function loadProjects(){
+  const {data,error}=await sb.from('projects').select('*,project_media(*)').order('created_at',{ascending:false});
+  if(error){alert(error.message);return}
+  projects=data||[];$('projectCount').textContent=projects.filter(p=>p.published).length;
+  $('pCount').textContent=projects.length;$('pPhotosCount').textContent=projects.reduce((a,p)=>a+(p.project_media||[]).filter(m=>m.media_type==='image').length,0);
+  $('pVideos').textContent=projects.reduce((a,p)=>a+(p.project_media||[]).filter(m=>m.media_type==='video').length,0);
+  $('mediaCount').textContent=$('pPhotos').textContent;
+  $('projectRows').innerHTML=projects.length?projects.map(p=>{
+    const s=services.find(x=>x.id===p.service_id)?.name||p.service_id;
+    const media=p.project_media||[];
+    const first=media.find(m=>m.media_type==='image');
+    return `<tr><td><strong>${esc(p.title)}</strong><br><small>${p.published?'Publicado':'Oculto'}</small></td><td>${esc(s)}</td><td>${esc(p.location||'')}</td>
+    <td>${first?`<img class="thumb" src="${esc(first.public_url)}">`:''}<br><small>${media.filter(m=>m.media_type==='image').length} foto(s) · ${media.filter(m=>m.media_type==='video').length+(p.video_url?1:0)} video(s)</small></td>
+    <td><button class="mini" onclick="editProject('${p.id}')">Editar</button> <button class="mini danger" onclick="deleteProject('${p.id}')">Eliminar</button></td></tr>`;
+  }).join(''):'<tr><td colspan="5" class="empty">No hay proyectos guardados.</td></tr>';
+}
+async function fileToData(file){
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsArrayBuffer(file)});
+}
+async function uploadFiles(projectId,files){
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`projects/${projectId}/${crypto.randomUUID()}.${ext}`;
+    const {error}=await sb.storage.from('seaire-images').upload(path,file,{upsert:false,contentType:file.type});
+    if(error)throw error;
+    const {data:u}=sb.storage.from('seaire-images').getPublicUrl(path);
+    const {error:me}=await sb.from('project_media').insert({project_id:projectId,media_type:'image',storage_path:path,public_url:u.publicUrl,sort_order:i});
+    if(me)throw me;
+  }
+}
+function clearProject(){editingId=null;currentMedia=[];$('projectForm').reset();$('pPhotoFiles').value='';$('projectId').value='';$('formTitle').textContent='Nuevo proyecto';$('pPreview').innerHTML=''}
+$('clearProject').onclick=clearProject;$('newProject').onclick=()=>{$('proyectos').scrollIntoView({behavior:'smooth'});clearProject()};
+$('pPhotoFiles').addEventListener('click',()=>{});
+
+async function editProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;editingId=id;$('projectId').value=id;$('pTitle').value=p.title;$('pService').value=p.service_id;$('pLocation').value=p.location||'';$('pDate').value=p.project_date||'';$('pDescription').value=p.description||'';$('pVideo').value=p.video_url||'';
+  currentMedia=p.project_media||[];$('pPreview').innerHTML=currentMedia.filter(m=>m.media_type==='image').map(m=>`<img src="${esc(m.public_url)}">`).join('');$('formTitle').textContent='Editar proyecto';$('proyectos').scrollIntoView({behavior:'smooth'})
+}
+async function deleteProject(id){
+  if(!confirm('¿Eliminar este proyecto y sus fotografías?'))return;
+  const media=(projects.find(p=>p.id===id)?.project_media||[]);
+  for(const m of media){if(m.storage_path)await sb.storage.from(m.media_type==='video'?'seaire-videos':'seaire-images').remove([m.storage_path])}
+  const {error}=await sb.from('projects').delete().eq('id',id);if(error){alert(error.message);return}await loadProjects()
+}
+$('pPhotoFiles').onchange=async e=>{
+  $('pPreview').innerHTML=[...e.target.files].map(f=>`<span style="color:#9fc0d9">${esc(f.name)}</span>`).join('<br>')
+};
+$('projectForm').onsubmit=async e=>{
+  e.preventDefault();
+  try{
+    const payload={service_id:$('pService').value,title:$('pTitle').value.trim(),location:$('pLocation').value.trim(),project_date:$('pDate').value||null,description:$('pDescription').value.trim(),video_url:$('pVideo').value.trim()||null,published:true,updated_at:new Date().toISOString()};
+    let id=editingId;
+    if(id){const {error}=await sb.from('projects').update(payload).eq('id',id);if(error)throw error}
+    else{const {data,error}=await sb.from('projects').insert(payload).select('id').single();if(error)throw error;id=data.id}
+    const files=[...$('pPhotoFiles').files];if(files.length)await uploadFiles(id,files);
+    alert('Proyecto guardado en la nube.');clearProject();await loadProjects();
+  }catch(e){alert('No se pudo guardar: '+e.message)}
+};
+start();
+</script></body></html>
