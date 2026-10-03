@@ -6,16 +6,30 @@
 *{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}
 .layout{min-height:100vh;display:grid;grid-template-columns:270px 1fr}.sidebar{background:var(--side);border-right:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}.brand{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--blue);margin-bottom:40px}.nav a{display:block;color:#dce7f2;text-decoration:none;padding:14px 16px;border-radius:12px;margin:5px 0}.nav a:hover,.nav a.active{background:#153753}.logout{margin-top:auto;background:#153753;border:0;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}.main{padding:34px;max-width:1500px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h1{font-size:34px;margin:0}.btn{border:0;border-radius:10px;padding:12px 18px;background:linear-gradient(135deg,var(--blue),#1684ff);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#153753}.btn.danger{background:#542033}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}.stat{padding:20px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:34px;margin-top:5px}.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{background:#102c45;border:1px solid var(--line);color:#dce7f2;padding:11px 14px;border-radius:10px;cursor:pointer}.tab.active{background:linear-gradient(135deg,#1684ff,#18b6ff);border-color:transparent}.section{display:none}.section.active{display:block}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px;width:100%}.field textarea{min-height:110px;resize:vertical}.field small{color:#8fa7bd}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}.service-row{display:grid;grid-template-columns:70px 1fr 2fr 100px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.service-row input{background:#061522;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px}.toggle{display:flex;gap:8px;align-items:center;color:#b9cce0}.check{width:18px!important;height:18px}.project-table{width:100%;border-collapse:collapse}.project-table th,.project-table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}.project-table th{color:#9fc0d9}.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.mini.danger{background:#4a1d2a}.preview{display:flex;gap:10px;flex-wrap:wrap}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.drop{border:1px dashed #2a678e;padding:16px;border-radius:12px}.toast{position:fixed;right:25px;bottom:25px;background:#0c2d43;border:1px solid #2c759d;padding:14px 18px;border-radius:12px;display:none;z-index:99}.toast.show{display:block}.danger-note{background:#392c12;border-color:#72591e}.jsonbox{font-family:Consolas,monospace;min-height:180px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.stats{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service-row{grid-template-columns:60px 1fr}.service-row>*:nth-child(3){grid-column:1/-1}}
+
+.login-gate{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 20%,rgba(24,168,255,.12),transparent 35%),var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}.login-card{width:min(430px,94vw);background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.45)}.login-card h1{margin:0 0 8px;color:var(--blue);font-size:34px}.login-card p{color:var(--muted);margin:0 0 22px}.login-card .field{margin-bottom:14px}.login-status{min-height:20px;margin-top:12px;font-size:14px;color:#ff9fb0}.hidden{display:none!important}.service-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}.service-form{background:#0a1c2e;border:1px dashed rgba(100,190,240,.25);border-radius:14px;padding:18px;margin-bottom:20px}.service-row{grid-template-columns:70px 1.1fr 2fr 90px 170px!important}.service-actions{display:flex;gap:6px;flex-wrap:wrap}.mini.ok{background:#0e4b3f}.mini.warn{background:#5a4214}.user-badge{font-size:12px;color:#8fa7bd;margin-top:10px;word-break:break-all}
 </style></head>
 <body>
-<div class="layout">
+<div class="login-gate" id="loginGate">
+  <div class="login-card">
+    <h1>SEAIRE</h1>
+    <p>Acceso al panel administrativo</p>
+    <form id="loginForm">
+      <div class="field"><label>Correo</label><input id="loginEmail" type="email" required autocomplete="username"></div>
+      <div class="field"><label>Contraseña</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
+      <button class="btn" style="width:100%" type="submit">Ingresar</button>
+      <div class="login-status" id="loginStatus"></div>
+    </form>
+  </div>
+</div>
+<div class="layout" id="adminApp">
 <aside class="sidebar"><div class="brand">SEAIRE</div><nav class="nav">
 <a class="active" href="#dashboard" data-tab="dashboard">▦ Dashboard</a>
 <a href="#empresa" data-tab="empresa">◉ Empresa</a><a href="#inicio" data-tab="inicio">⌂ Inicio</a>
 <a href="#nosotros" data-tab="nosotros">◎ Nosotros</a><a href="#servicios" data-tab="servicios">⚡ Servicios</a>
 <a href="#proyectos" data-tab="proyectos">▣ Proyectos</a><a href="#cotizacion" data-tab="cotizacion">✉ Cotización</a>
 <a href="#contacto" data-tab="contacto">☎ Contacto</a><a href="#respaldo" data-tab="respaldo">↕ Respaldo</a>
-</nav><button class="logout" onclick="location.href='index.html'">Ver página pública</button></aside>
+</nav><div style="margin-top:auto;display:grid;gap:8px"><button class="logout" style="margin-top:0" onclick="location.href='index.html'">Ver página pública</button><button class="logout" id="logoutBtn" style="background:#542033">Cerrar sesión</button></div></aside>
 <main class="main">
 <div class="top"><h1 id="pageTitle">Dashboard</h1><div><button class="btn secondary" onclick="location.href='index.html'">Ver página</button> <button class="btn" onclick="saveAll()">Guardar cambios</button></div></div>
 <div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos mantienen su galería actual.</div>
@@ -50,7 +64,23 @@
 <div class="field"><label>Etiqueta</label><input data-bind="servicesHead.eyebrow"></div><div class="field"><label>Título</label><input data-bind="servicesHead.title"></div>
 <div class="field full"><label>Descripción</label><textarea data-bind="servicesHead.description"></textarea></div>
 </div></div>
-<div class="panel"><h2>Servicios</h2><div id="serviceEditor"></div></div></section>
+<div class="panel">
+  <div class="top" style="margin-bottom:14px"><div><h2 style="margin:0 0 6px">Servicios de la página web</h2><p style="margin:0;color:#9fb2c5">Estos servicios se guardan en Supabase y son los que aparecen públicamente en la web.</p></div><button class="btn" type="button" onclick="showServiceForm()">+ Agregar servicio</button></div>
+  <div id="serviceEditor"></div>
+</div>
+<div class="panel service-form hidden" id="serviceFormPanel">
+  <h2 id="serviceFormTitle">Nuevo servicio</h2>
+  <form id="serviceForm"><input type="hidden" id="serviceId">
+    <div class="form-grid">
+      <div class="field"><label>Nombre del servicio *</label><input id="serviceName" required></div>
+      <div class="field"><label>Ícono / emoji</label><input id="serviceIcon" placeholder="⚡"></div>
+      <div class="field full"><label>Descripción *</label><textarea id="serviceDescription" required></textarea></div>
+      <div class="field"><label>Orden</label><input id="serviceOrder" type="number" min="0" value="0"></div>
+      <label class="toggle" style="align-self:end"><input class="check" id="serviceActive" type="checkbox" checked> Mostrar en la página web</label>
+    </div>
+    <div class="actions"><button type="button" class="btn secondary" onclick="hideServiceForm()">Cancelar</button><button class="btn" type="submit">Guardar servicio</button></div>
+  </form>
+</div></section>
 
 <section id="proyectos" class="section"><div class="panel"><h2>Encabezado de proyectos</h2><div class="form-grid">
 <div class="field"><label>Etiqueta</label><input data-bind="projectsHead.eyebrow"></div><div class="field"><label>Título</label><input data-bind="projectsHead.title"></div>
@@ -84,20 +114,105 @@
 </div><div class="actions"><button class="btn secondary" onclick="exportConfig()">Exportar configuración</button><label class="btn secondary" style="display:inline-flex;align-items:center;cursor:pointer">Importar configuración<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" onclick="resetConfig()">Restablecer contenido original</button></div></div></section>
 </main></div><div class="toast" id="toast"></div>
 
-<script src="seaire-config.js"></script><script src="seaire-projects.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="seaire-config.js"></script><script src="seaire-projects.js"></script>
 <script>
-let cfg=SEAIRE_CONFIG.read(), currentPhotos=[];
+const sb=supabase.createClient(SEAIRE_CONFIG.SUPABASE_URL,SEAIRE_CONFIG.SUPABASE_ANON_KEY);
+let cfg=SEAIRE_CONFIG.read(), currentPhotos=[], cloudServices=[];
 const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const loginStatus=$('loginStatus');
+function setLoginStatus(t){loginStatus.textContent=t||''}
+async function isAdmin(){
+  const {data:{user},error:authError}=await sb.auth.getUser();
+  if(authError||!user)return false;
+  const {data,error}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+  if(error){console.error(error);return false;}
+  return !!data;
+}
+async function bootAuth(){
+  if(await isAdmin()){$('loginGate').classList.add('hidden');$('adminApp').classList.remove('hidden');await loadCloudServices();return;}
+  $('adminApp').classList.add('hidden');$('loginGate').classList.remove('hidden');
+}
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();setLoginStatus('Ingresando…');
+  const {error}=await sb.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+  if(error){setLoginStatus(error.message);return;}
+  if(!await isAdmin()){await sb.auth.signOut();setLoginStatus('El usuario inició sesión, pero no está autorizado como administrador.');return;}
+  setLoginStatus('');$('loginGate').classList.add('hidden');$('adminApp').classList.remove('hidden');await loadCloudServices();
+});
+$('logoutBtn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});
 const paths={}; function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)} function set(obj,path,val){const a=path.split('.');let o=obj;for(let i=0;i<a.length-1;i++)o=o[a[i]];o[a[a.length-1]]=val}
 function bindFields(){document.querySelectorAll('[data-bind]').forEach(e=>{const p=e.dataset.bind;e.value=get(cfg,p)??'';e.oninput=()=>set(cfg,p,e.value)});}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
-function renderServices(){const wrap=$('serviceEditor');wrap.innerHTML=cfg.services.map((s,i)=>`<div class="service-row"><input value="${esc(s.icon)}" data-s="${i}" data-k="icon"><input value="${esc(s.name)}" data-s="${i}" data-k="name"><input value="${esc(s.description)}" data-s="${i}" data-k="description"><label class="toggle"><input class="check" type="checkbox" ${s.enabled?'checked':''} data-s="${i}" data-k="enabled"> Activo</label></div>`).join('');wrap.querySelectorAll('[data-s]').forEach(e=>e.oninput=e.onchange=()=>{const i=+e.dataset.s;const k=e.dataset.k;cfg.services[i][k]=e.type==='checkbox'?e.checked:e.value});}
+async function loadCloudServices(){
+  try{
+    const {data,error}=await sb.from('services').select('id,name,description,icon,active,sort_order').order('sort_order',{ascending:true});
+    if(error) throw error;
+    cloudServices=data||[];
+    renderServices();
+    renderStats();
+    $('serviceFormPanel').classList.add('hidden');
+  }catch(err){
+    console.error('SEAIRE servicios:',err);
+    $('serviceEditor').innerHTML='<div class="notice danger-note">No se pudieron cargar los servicios desde Supabase. Revisa las políticas RLS de la tabla <strong>public.services</strong>.</div>';
+  }
+}
+function serviceSlug(name){return String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'servicio-'+Date.now()}
+function renderServices(){
+  const wrap=$('serviceEditor');
+  if(!cloudServices.length){wrap.innerHTML='<div class="notice">No hay servicios creados todavía. Pulsa <strong>+ Agregar servicio</strong> para crear el primero.</div>';return;}
+  wrap.innerHTML=`<div class="service-row" style="font-weight:800;color:#9fc0d9"><div>Ícono</div><div>Servicio</div><div>Descripción</div><div>Estado</div><div>Acciones</div></div>`+cloudServices.map(s=>`<div class="service-row">
+    <input value="${esc(s.icon||'⚡')}" aria-label="Icono" onchange="updateService('${esc(s.id)}','icon',this.value)">
+    <input value="${esc(s.name||'')}" aria-label="Nombre" onchange="updateService('${esc(s.id)}','name',this.value)">
+    <input value="${esc(s.description||'')}" aria-label="Descripción" onchange="updateService('${esc(s.id)}','description',this.value)">
+    <span class="toggle">${s.active?'Activo':'Oculto'}</span>
+    <div class="service-actions"><button class="mini" onclick="editService('${esc(s.id)}')">Editar</button><button class="mini ${s.active?'warn':'ok'}" onclick="toggleService('${esc(s.id)}',${!s.active})">${s.active?'Quitar':'Mostrar'}</button><button class="mini danger" onclick="deleteCloudService('${esc(s.id)}')">Eliminar</button></div>
+  </div>`).join('');
+}
+async function updateService(id,key,value){
+  const allowed=['icon','name','description']; if(!allowed.includes(key)) return;
+  const {error}=await sb.from('services').update({[key]:value.trim()}).eq('id',id);
+  if(error){toast('No se pudo actualizar el servicio');console.error(error);await loadCloudServices();return;}
+  const s=cloudServices.find(x=>x.id===id); if(s)s[key]=value.trim(); renderServices(); toast('Servicio actualizado');
+}
+function showServiceForm(service=null){
+  $('serviceFormPanel').classList.remove('hidden');$('serviceFormTitle').textContent=service?'Editar servicio':'Nuevo servicio';
+  $('serviceId').value=service?.id||'';$('serviceName').value=service?.name||'';$('serviceIcon').value=service?.icon||'⚡';$('serviceDescription').value=service?.description||'';$('serviceOrder').value=service?.sort_order??cloudServices.length;$('serviceActive').checked=service?.active!==false;
+  $('serviceFormPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function editService(id){const s=cloudServices.find(x=>x.id===id);if(s)showServiceForm(s)}
+function hideServiceForm(){$('serviceFormPanel').classList.add('hidden');$('serviceForm').reset();$('serviceId').value='';$('serviceActive').checked=true}
+$('serviceForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const name=$('serviceName').value.trim(), description=$('serviceDescription').value.trim();
+  if(!name||!description)return;
+  const existingId=$('serviceId').value.trim();
+  const id=existingId||serviceSlug(name);
+  const payload={id,name,description,icon:$('serviceIcon').value.trim()||'⚡',active:$('serviceActive').checked,sort_order:Number($('serviceOrder').value)||0};
+  try{
+    const {error}=await sb.from('services').upsert(payload,{onConflict:'id'});
+    if(error)throw error;
+    await loadCloudServices();hideServiceForm();toast(existingId?'Servicio actualizado.':'Servicio agregado a la página.');
+  }catch(err){console.error(err);alert('No se pudo guardar el servicio. Si es un servicio nuevo, verifica que la tabla services use un ID de texto y que RLS permita INSERT/UPDATE para el administrador.');}
+});
+async function toggleService(id,active){
+  const {error}=await sb.from('services').update({active}).eq('id',id);
+  if(error){console.error(error);alert('No se pudo cambiar el estado del servicio.');return;}
+  await loadCloudServices();toast(active?'Servicio visible en la web.':'Servicio quitado de la web.');
+}
+async function deleteCloudService(id){
+  const s=cloudServices.find(x=>x.id===id);
+  if(!confirm(`¿Eliminar definitivamente el servicio "${s?.name||id}"?\n\nSi tiene proyectos asociados, Supabase puede impedir la eliminación. En ese caso usa "Quitar" para ocultarlo sin perderlo.`))return;
+  const {error}=await sb.from('services').delete().eq('id',id);
+  if(error){console.error(error);alert('No se pudo eliminar. Puede tener proyectos asociados o una política RLS puede impedirlo. Usa "Quitar" para ocultarlo.');return;}
+  await loadCloudServices();toast('Servicio eliminado.');
+}
+
 function renderNav(){const labels={inicio:'Inicio',servicios:'Servicios',proyectos:'Proyectos',nosotros:'Nosotros',cotizacion:'Cotización',contacto:'Contacto',cta:'Botón'};$('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k])}"></div>`).join('');$('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value)}
 function renderLogo(){const p=$('logoPreview');p.innerHTML=cfg.brand.logo?`<img src="${cfg.brand.logo}" alt="Logo">`:''}
 function saveAll(){SEAIRE_CONFIG.write(cfg);toast('Cambios guardados. Abre la página pública para verificarlos.');renderStats();}
 document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(a.dataset.tab).classList.add('active');$('pageTitle').textContent=a.textContent.replace(/^[^A-Za-zÁÉÍÓÚÑ]+/,'').trim();location.hash=a.dataset.tab});
-function renderStats(){const ps=SEAIRE_PROJECTS.read();$('sCount').textContent=cfg.services.filter(s=>s.enabled).length;$('pCount').textContent=ps.length;$('photoCount').textContent=ps.reduce((n,p)=>n+(p.photos||[]).length,0);$('videoCount').textContent=ps.filter(p=>p.videoUrl).length;}
-function serviceOptions(){return cfg.services.map(s=>`<option value="${s.id}">${esc(s.icon)} ${esc(s.name)}</option>`).join('')}
+function renderStats(){const ps=SEAIRE_PROJECTS.read();$('sCount').textContent=cloudServices.filter(s=>s.active).length;$('pCount').textContent=ps.length;$('photoCount').textContent=ps.reduce((n,p)=>n+(p.photos||[]).length,0);$('videoCount').textContent=ps.filter(p=>p.videoUrl).length;}
+function serviceOptions(){const list=cloudServices.length?cloudServices:cfg.services;return list.map(s=>`<option value="${s.id}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')}
 function renderProjects(){const ps=SEAIRE_PROJECTS.read();$('projectRows').innerHTML=ps.length?ps.map(p=>`<tr><td><strong>${esc(p.title)}</strong><br><small>${esc(p.date||'')}</small></td><td>${esc((cfg.services.find(s=>s.id===p.service)||{}).name||p.service)}</td><td>${esc(p.location||'')}</td><td>${p.photos?.length||0} foto(s)${p.videoUrl?' · video':''}</td><td><button class="mini" onclick="editProject('${p.id}')">Editar</button> <button class="mini danger" onclick="deleteProject('${p.id}')">Eliminar</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>'}
 function newProject(){currentPhotos=[];$('projectEditor').style.display='block';$('projectForm').reset();$('projectId').value='';$('pservice').innerHTML=serviceOptions();$('ppreview').innerHTML='';$('projectFormTitle').textContent='Nuevo proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})}
 function cancelProject(){$('projectEditor').style.display='none'}
@@ -112,6 +227,6 @@ $('logoFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!
 function exportConfig(){const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();URL.revokeObjectURL(a.href)}
 $('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{cfg=JSON.parse(await f.text());cfg=Object.assign(SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT),cfg);bindFields();renderServices();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.')}catch(err){alert('Archivo de configuración no válido.')}});
 function resetConfig(){if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;cfg=SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT);bindFields();renderServices();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.')}
-bindFields();renderServices();renderNav();renderLogo();renderProjects();renderStats();
+bindFields();renderNav();renderLogo();renderProjects();renderStats();bootAuth();
 if(location.hash && $(location.hash.slice(1))){document.querySelector(`[data-tab="${location.hash.slice(1)}"]`)?.click()}
 </script></body></html>
