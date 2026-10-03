@@ -241,17 +241,81 @@ form.addEventListener("submit",function(e){
   <button class="viewer-close" id="viewerClose" type="button" aria-label="Cerrar">×</button>
   <div class="media-viewer-content"><div class="viewer-placeholder" id="viewerPlaceholder">📷</div><div class="viewer-title" id="viewerTitle"></div></div>
 </div>
+<script>
+const galleryData={
+  ingenieria:{title:'Ingeniería eléctrica',description:'Redes MT/BT, instalaciones, diseño, estudios y ejecución de soluciones eléctricas.',items:[['Repotenciación eléctrica','Transformación y distribución','⚡'],['Red MT / BT','Diseño y construcción de redes','🔌'],['Instalaciones eléctricas','Montaje y puesta en servicio','🏗️']]},
+  automatizacion:{title:'Automatización industrial',description:'Tableros, variadores, motores, control e instrumentación.',items:[['Tablero de control','Integración de control','🏭'],['Variadores de velocidad','Control de motores','⚙️'],['Automatización de procesos','Programación e integración','🎛️']]},
+  mantenimiento:{title:'Mantenimiento',description:'Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio.',items:[['Mantenimiento preventivo','Inspección y mantenimiento','🔧'],['Pruebas eléctricas','Diagnóstico y verificación','🧪'],['Puesta en servicio','Arranque y comprobación','✅']]},
+  solar:{title:'Energía solar',description:'Sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.',items:[['Sistema fotovoltaico','Paneles e inversores','☀️'],['Almacenamiento','Baterías y respaldo','🔋'],['Estación solar','Soluciones modulares','🌞']]},
+  transformadores:{title:'Transformadores',description:'Instalación, mantenimiento, pruebas y soluciones para sistemas de distribución.',items:[['Transformador de potencia','Montaje y conexión','🔌'],['Transformador trifásico','Instalación y pruebas','⚡'],['Trafomix','Medición y protección','📊']]},
+  asesoria:{title:'Asesoría técnica',description:'Evaluación de proyectos, especificaciones, presupuestos y documentación técnica.',items:[['Diseño de proyecto','Ingeniería y documentación','📐'],['Memoria técnica','Cálculos y especificaciones','📄'],['Supervisión técnica','Acompañamiento profesional','👷']]}
+};
+const galleryModal=document.getElementById('galleryModal'),galleryGrid=document.getElementById('galleryGrid'),galleryTitle=document.getElementById('galleryTitle'),galleryDescription=document.getElementById('galleryDescription');
+const mediaViewer=document.getElementById('mediaViewer'),viewerPlaceholder=document.getElementById('viewerPlaceholder'),viewerTitle=document.getElementById('viewerTitle');
+function openGallery(key){const d=galleryData[key];galleryTitle.textContent=d.title;galleryDescription.textContent=d.description;galleryGrid.innerHTML=d.items.map((x,i)=>`<article class="gallery-item" data-index="${i}"><div class="gallery-media">${x[2]}<span>Galería multimedia</span></div><div class="gallery-item-body"><strong>${x[0]}</strong><small>${x[1]}</small></div></article>`).join('');galleryModal.classList.add('open');galleryModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';galleryGrid.querySelectorAll('.gallery-item').forEach((el,i)=>el.addEventListener('click',()=>openViewer(d.items[i])))}
+function closeGallery(){galleryModal.classList.remove('open');galleryModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+function openViewer(item){viewerPlaceholder.textContent=item[2];viewerTitle.textContent=item[0]+' — '+item[1];mediaViewer.classList.add('open');mediaViewer.setAttribute('aria-hidden','false')}
+function closeViewer(){mediaViewer.classList.remove('open');mediaViewer.setAttribute('aria-hidden','true')}
+document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>openGallery(card.dataset.service)));
+document.querySelectorAll('[data-close-gallery]').forEach(el=>el.addEventListener('click',closeGallery));document.getElementById('viewerClose').addEventListener('click',closeViewer);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeViewer();closeGallery()}});
+</script>
 
 
 <style>
 .dynamic-project{cursor:pointer}.project-media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.project-media-grid img{width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid var(--line)}@media(max-width:800px){.project-media-grid{grid-template-columns:1fr}}
 </style>
 
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function applySiteConfig(){
+ const c=SEAIRE_CONFIG.read();
+ document.title=c.seo.title;
+ const md=document.querySelector('meta[name="description"]'); if(md) md.content=c.seo.description;
+ const navMap={inicio:'a[href="#inicio"]',servicios:'a[href="#servicios"]',proyectos:'a[href="#proyectos"]',nosotros:'a[href="#nosotros"]',cotizacion:'a[href="#cotizacion"]',contacto:'a[href="#contacto"]'};
+ Object.entries(navMap).forEach(([k,s])=>{const e=document.querySelector('.links '+s);if(e)e.textContent=c.nav[k]});
+ const navCta=document.querySelector('nav .cta');if(navCta)navCta.textContent=c.nav.cta;
+ document.querySelectorAll('.logo').forEach(e=>e.innerHTML=c.brand.name.replace(/IRE$/,'<span>IRE</span>'));
+ const hero=document.querySelector('.hero');
+ if(hero){
+   const badge=hero.querySelector('.badge');if(badge)badge.textContent=c.hero.badge;
+   const h=hero.querySelector('h1');if(h)h.innerHTML=esc(c.hero.title)+' <span>'+esc(c.hero.highlight)+'</span>';
+   const p=hero.querySelector('p');if(p)p.textContent=c.hero.description;
+   const as=hero.querySelectorAll('.actions a');if(as[0])as[0].textContent=c.hero.primary;if(as[1])as[1].textContent=c.hero.secondary;
+   const img=hero.querySelector('img');if(img)img.src=c.brand.logo||'./logo-seaire.jpeg';
+ }
+ const sh=document.querySelector('#servicios .section-head'); if(sh){
+   sh.querySelector('.eyebrow').textContent=c.servicesHead.eyebrow;
+   sh.querySelector('h2').textContent=c.servicesHead.title;
+   sh.querySelector('.lead').textContent=c.servicesHead.description;
+ }
+ const serviceWrap=document.querySelector('.service-cards');
+ if(serviceWrap){
+   serviceWrap.innerHTML=c.services.filter(s=>s.enabled).map(s=>`<article class="card service-card" data-service="${esc(s.id)}"><div class="icon">${esc(s.icon)}</div><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p><span class="view-work">Ver trabajos →</span></article>`).join('');
+ }
+ const ah=document.querySelector('#nosotros .section-head'); if(ah){
+   ah.querySelector('.eyebrow').textContent=c.about.eyebrow; ah.querySelector('h2').textContent=c.about.title;
+ }
+ const cards=document.querySelectorAll('#nosotros .about-card');
+ if(cards.length>=3){cards[0].querySelector('h3').textContent=c.about.whoTitle;cards[0].querySelector('p').textContent=c.about.who;cards[1].querySelector('p').textContent=c.about.mission;cards[2].querySelector('p').textContent=c.about.vision;}
+ const ph=document.querySelector('#proyectos .section-head');if(ph){ph.querySelector('.eyebrow').textContent=c.projectsHead.eyebrow;ph.querySelector('h2').textContent=c.projectsHead.title;ph.querySelector('.lead').textContent=c.projectsHead.description}
+ const q=document.querySelector('#cotizacion .quote');if(q){q.querySelector('.eyebrow').textContent=c.quote.eyebrow;q.querySelector('h2').textContent=c.quote.title;q.querySelector('.lead').textContent=c.quote.description;const b=q.querySelector('button');if(b)b.textContent=c.quote.button;}
+ const ch=document.querySelector('#contacto .section-head');if(ch){ch.querySelector('.eyebrow').textContent=c.contact.eyebrow;ch.querySelector('h2').textContent=c.contact.title;ch.querySelector('.lead').textContent=c.contact.description;}
+ const phone=document.querySelector('#contacto .card:nth-child(1) a');if(phone){phone.textContent=c.contact.whatsapp;phone.href='https://wa.me/'+c.contact.phoneLink}
+ const email=document.querySelector('#contacto .card:nth-child(2) a');if(email){email.textContent=c.contact.email;email.href='mailto:'+c.contact.email}
+ const foot=document.querySelector('footer');if(foot){const strong=foot.querySelector('strong');if(strong)strong.textContent=c.brand.legal;const divs=foot.querySelectorAll('.footer>div');if(divs[0])divs[0].innerHTML='<strong style="color:#fff">'+esc(c.brand.legal)+'</strong><br>'+esc(c.brand.tagline);if(divs[1])divs[1].innerHTML='WhatsApp: '+esc(c.contact.whatsapp)+' · '+esc(c.contact.email)+'<br>'+esc(c.footer.copyright)}
+ // rebuild service click handlers because cards are dynamic
+ document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>{if(typeof openGallery==='function')openGallery(card.dataset.service)}));
+}
+applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
+</script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./seaire-config.js"></script>
-<script src="./seaire-cloud.js"></script>
+<script src="seaire-config.js"></script>
+<script src="seaire-cloud.js"></script>
 <script>
 (async function(){
   const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
