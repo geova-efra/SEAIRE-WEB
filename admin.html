@@ -8,14 +8,35 @@
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.stats{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service-row{grid-template-columns:60px 1fr}.service-row>*:nth-child(3){grid-column:1/-1}}
 </style></head>
 <body>
-<div class="layout">
+
+<div id="authGate" style="position:fixed;inset:0;background:#061321;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="panel" style="width:min(430px,100%);margin:0">
+    <div class="brand" style="margin-bottom:20px">SEAIRE</div>
+    <h2 style="margin-top:0">Acceso administrativo</h2>
+    <p style="color:#a8bdd1">Ingresa con el correo y contraseña registrados en Supabase.</p>
+    <form id="loginForm">
+      <div class="field" style="margin-bottom:14px">
+        <label>Correo electrónico</label>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Contraseña</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </div>
+      <div id="loginError" class="notice danger-note" style="display:none"></div>
+      <button class="btn" style="width:100%" type="submit" id="loginBtn">Ingresar</button>
+    </form>
+  </div>
+</div>
+
+<div class="layout" id="adminApp" style="display:none">
 <aside class="sidebar"><div class="brand">SEAIRE</div><nav class="nav">
 <a class="active" href="#dashboard" data-tab="dashboard">▦ Dashboard</a>
 <a href="#empresa" data-tab="empresa">◉ Empresa</a><a href="#inicio" data-tab="inicio">⌂ Inicio</a>
 <a href="#nosotros" data-tab="nosotros">◎ Nosotros</a><a href="#servicios" data-tab="servicios">⚡ Servicios</a>
 <a href="#proyectos" data-tab="proyectos">▣ Proyectos</a><a href="#cotizacion" data-tab="cotizacion">✉ Cotización</a>
 <a href="#contacto" data-tab="contacto">☎ Contacto</a><a href="#respaldo" data-tab="respaldo">↕ Respaldo</a>
-</nav><button class="logout" onclick="location.href='index.html'">Ver página pública</button></aside>
+</nav><button class="logout" onclick="location.href='index.html'">Ver página pública</button><button class="logout" id="logoutBtn" style="margin-top:10px;background:#542033">Cerrar sesión</button></aside>
 <main class="main">
 <div class="top"><h1 id="pageTitle">Dashboard</h1><div><button class="btn secondary" onclick="location.href='index.html'">Ver página</button> <button class="btn" onclick="saveAll()">Guardar cambios</button></div></div>
 <div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos mantienen su galería actual.</div>
@@ -84,21 +105,185 @@
 </div><div class="actions"><button class="btn secondary" onclick="exportConfig()">Exportar configuración</button><label class="btn secondary" style="display:inline-flex;align-items:center;cursor:pointer">Importar configuración<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" onclick="resetConfig()">Restablecer contenido original</button></div></div></section>
 </main></div><div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="seaire-config.js"></script><script src="seaire-projects.js"></script>
 <script>
 let cfg=SEAIRE_CONFIG.read(), currentPhotos=[];
 const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-const paths={}; function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)} function set(obj,path,val){const a=path.split('.');let o=obj;for(let i=0;i<a.length-1;i++)o=o[a[i]];o[a[a.length-1]]=val}
+const SUPABASE_URL = window.SEAIRE_SUPABASE_URL || (typeof SUPABASE_URL_CONFIG!=='undefined'?SUPABASE_URL_CONFIG:null) || (typeof SUPABASE_URL!=='undefined'?SUPABASE_URL:null);
+const SUPABASE_KEY = window.SEAIRE_SUPABASE_ANON_KEY || (typeof SUPABASE_ANON_KEY_CONFIG!=='undefined'?SUPABASE_ANON_KEY_CONFIG:null) || (typeof SUPABASE_ANON_KEY!=='undefined'?SUPABASE_ANON_KEY:null);
+let sb=null, authUser=null, dbServices=[];
+
+function showLoginError(msg){$('loginError').textContent=msg;$('loginError').style.display='block'}
+function hideLoginError(){$('loginError').style.display='none'}
+function showAdmin(){ $('authGate').style.display='none'; $('adminApp').style.display='grid'; }
+function showLogin(){ $('adminApp').style.display='none'; $('authGate').style.display='flex'; }
+
+async function initSupabase(){
+  if(!SUPABASE_URL || !SUPABASE_KEY){
+    showLoginError('No se encontró la configuración de Supabase. Revisa seaire-config.js.');
+    return false;
+  }
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  const {data:{session}}=await sb.auth.getSession();
+  if(session?.user){await authorize(session.user)}
+  sb.auth.onAuthStateChange(async(_event,session)=>{
+    if(session?.user){await authorize(session.user)}
+    else {authUser=null;showLogin()}
+  });
+  return true;
+}
+
+async function authorize(user){
+  // Authentication is always Supabase Auth. If admin_users exists, use it as an additional authorization check.
+  const {data,error}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
+  if(error && !/relation .*admin_users.* does not exist/i.test(error.message)){
+    showLoginError('No se pudo verificar el administrador: '+error.message);
+    await sb.auth.signOut();
+    return;
+  }
+  if(data || (error && /relation .*admin_users.* does not exist/i.test(error.message))){
+    authUser=user;
+    hideLoginError();showAdmin();await loadSupabaseServices();bindFields();renderServices();renderNav();renderLogo();renderProjects();renderStats();
+  }else{
+    showLoginError('El usuario de Supabase inició sesión, pero no está autorizado como administrador.');
+    await sb.auth.signOut();
+  }
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();hideLoginError();
+  $('loginBtn').disabled=true;$('loginBtn').textContent='Ingresando...';
+  try{
+    if(!sb && !(await initSupabase())) return;
+    const {error}=await sb.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+    if(error) throw error;
+  }catch(e){showLoginError(e.message||'No fue posible iniciar sesión.')}
+  finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Ingresar'}
+});
+
+$('logoutBtn').onclick=async()=>{
+  if(!confirm('¿Deseas cerrar la sesión administrativa?')) return;
+  if(sb) await sb.auth.signOut();
+  showLogin();
+  $('loginPassword').value='';
+};
+
+const paths={};
+function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)}
+function set(obj,path,val){const a=path.split('.');let o=obj;for(let i=0;i<a.length-1;i++)o=o[a[i]];o[a[a.length-1]]=val}
 function bindFields(){document.querySelectorAll('[data-bind]').forEach(e=>{const p=e.dataset.bind;e.value=get(cfg,p)??'';e.oninput=()=>set(cfg,p,e.value)});}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
-function renderServices(){const wrap=$('serviceEditor');wrap.innerHTML=cfg.services.map((s,i)=>`<div class="service-row"><input value="${esc(s.icon)}" data-s="${i}" data-k="icon"><input value="${esc(s.name)}" data-s="${i}" data-k="name"><input value="${esc(s.description)}" data-s="${i}" data-k="description"><label class="toggle"><input class="check" type="checkbox" ${s.enabled?'checked':''} data-s="${i}" data-k="enabled"> Activo</label></div>`).join('');wrap.querySelectorAll('[data-s]').forEach(e=>e.oninput=e.onchange=()=>{const i=+e.dataset.s;const k=e.dataset.k;cfg.services[i][k]=e.type==='checkbox'?e.checked:e.value});}
+
+async function loadSupabaseServices(){
+  if(!sb)return;
+  const {data,error}=await sb.from('services').select('*').order('sort_order',{ascending:true});
+  if(error){toast('Error cargando servicios: '+error.message);return}
+  dbServices=data||[];
+  $('sCount').textContent=dbServices.filter(s=>s.active).length;
+}
+
+function renderServices(){
+  const wrap=$('serviceEditor');
+  if(dbServices.length){
+    wrap.innerHTML=dbServices.map(s=>`<div class="service-row" data-id="${esc(s.id)}">
+      <input class="dbIcon" value="${esc(s.icon||'⚡')}" title="Icono">
+      <input class="dbName" value="${esc(s.name||'')}" title="Nombre">
+      <input class="dbDesc" value="${esc(s.description||'')}" title="Descripción">
+      <label class="toggle"><input class="check dbActive" type="checkbox" ${s.active?'checked':''}> Activo</label>
+    </div>`).join('');
+  }else{
+    wrap.innerHTML='<div class="notice">No hay servicios registrados en Supabase. Usa “Agregar servicio” para crear el primero.</div>';
+  }
+  // Add service controls without changing the existing panel structure.
+  if(!document.getElementById('addServiceBtn')){
+    const panel=wrap.parentElement;
+    const title=panel.querySelector('h2');
+    const btn=document.createElement('button');
+    btn.id='addServiceBtn';btn.className='btn secondary';btn.textContent='+ Agregar servicio';
+    btn.style.marginBottom='15px';btn.onclick=addService;
+    title.insertAdjacentElement('afterend',btn);
+  }
+}
+
+async function addService(){
+  const name=prompt('Nombre del nuevo servicio:');
+  if(name===null)return;
+  const cleanName=name.trim();
+  if(!cleanName){alert('El nombre del servicio es obligatorio.');return}
+  const description=prompt('Descripción del servicio:')||'';
+  const icon=prompt('Icono (por ejemplo ⚡):','⚡')||'⚡';
+  const nextOrder=dbServices.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1)+1;
+  const {error}=await sb.from('services').insert({
+    name:cleanName,description:description.trim(),icon:icon.trim(),
+    active:true,sort_order:nextOrder,updated_at:new Date().toISOString()
+  });
+  if(error){alert('No se pudo agregar el servicio: '+error.message);return}
+  await loadSupabaseServices();renderServices();renderProjects();renderStats();toast('Servicio agregado.');
+}
+
+async function saveServices(){
+  for(const row of document.querySelectorAll('#serviceEditor .service-row')){
+    const id=row.dataset.id;
+    const payload={
+      icon:row.querySelector('.dbIcon').value.trim()||'⚡',
+      name:row.querySelector('.dbName').value.trim(),
+      description:row.querySelector('.dbDesc').value.trim(),
+      active:row.querySelector('.dbActive').checked,
+      updated_at:new Date().toISOString()
+    };
+    if(!payload.name){alert('Todos los servicios deben tener nombre.');return}
+    const {error}=await sb.from('services').update(payload).eq('id',id);
+    if(error){alert('No se pudo guardar el servicio: '+error.message);return}
+  }
+  await loadSupabaseServices();renderServices();renderProjects();renderStats();toast('Servicios guardados en Supabase.');
+}
+
+if(!document.getElementById('saveServicesBtn')){
+  const servicePanel=document.getElementById('serviceEditor').parentElement;
+  const btn=document.createElement('button');
+  btn.id='saveServicesBtn';btn.className='btn';btn.textContent='Guardar servicios';
+  btn.style.marginTop='15px';btn.onclick=saveServices;
+  servicePanel.appendChild(btn);
+}
+
+// "Quitar" means deactivate first; if there are no associated projects, delete.
+async function removeService(){
+  if(!dbServices.length)return;
+  const list=dbServices.map((s,i)=>`${i+1}. ${s.name}${s.active?'':' (oculto)'}`).join('\n');
+  const answer=prompt('Escribe el número del servicio que deseas quitar:\n\n'+list);
+  if(answer===null)return;
+  const index=Number(answer)-1;
+  if(!Number.isInteger(index)||!dbServices[index]){alert('Número inválido.');return}
+  const s=dbServices[index];
+  if(!confirm(`¿Quitar "${s.name}" de la página web?`))return;
+  const {error}=await sb.from('services').update({active:false,updated_at:new Date().toISOString()}).eq('id',s.id);
+  if(error){alert('No se pudo quitar el servicio: '+error.message);return}
+  await loadSupabaseServices();renderServices();renderProjects();renderStats();toast('Servicio quitado de la página.');
+}
+if(!document.getElementById('removeServiceBtn')){
+  const servicePanel=document.getElementById('serviceEditor').parentElement;
+  const btn=document.createElement('button');
+  btn.id='removeServiceBtn';btn.className='btn danger';btn.textContent='Quitar servicio';
+  btn.style.marginTop='10px';btn.onclick=removeService;
+  servicePanel.appendChild(btn);
+}
+
 function renderNav(){const labels={inicio:'Inicio',servicios:'Servicios',proyectos:'Proyectos',nosotros:'Nosotros',cotizacion:'Cotización',contacto:'Contacto',cta:'Botón'};$('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k])}"></div>`).join('');$('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value)}
 function renderLogo(){const p=$('logoPreview');p.innerHTML=cfg.brand.logo?`<img src="${cfg.brand.logo}" alt="Logo">`:''}
-function saveAll(){SEAIRE_CONFIG.write(cfg);toast('Cambios guardados. Abre la página pública para verificarlos.');renderStats();}
+async function saveAll(){SEAIRE_CONFIG.write(cfg);await saveServices();toast('Cambios guardados.');renderStats();}
+
 document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(a.dataset.tab).classList.add('active');$('pageTitle').textContent=a.textContent.replace(/^[^A-Za-zÁÉÍÓÚÑ]+/,'').trim();location.hash=a.dataset.tab});
-function renderStats(){const ps=SEAIRE_PROJECTS.read();$('sCount').textContent=cfg.services.filter(s=>s.enabled).length;$('pCount').textContent=ps.length;$('photoCount').textContent=ps.reduce((n,p)=>n+(p.photos||[]).length,0);$('videoCount').textContent=ps.filter(p=>p.videoUrl).length;}
-function serviceOptions(){return cfg.services.map(s=>`<option value="${s.id}">${esc(s.icon)} ${esc(s.name)}</option>`).join('')}
-function renderProjects(){const ps=SEAIRE_PROJECTS.read();$('projectRows').innerHTML=ps.length?ps.map(p=>`<tr><td><strong>${esc(p.title)}</strong><br><small>${esc(p.date||'')}</small></td><td>${esc((cfg.services.find(s=>s.id===p.service)||{}).name||p.service)}</td><td>${esc(p.location||'')}</td><td>${p.photos?.length||0} foto(s)${p.videoUrl?' · video':''}</td><td><button class="mini" onclick="editProject('${p.id}')">Editar</button> <button class="mini danger" onclick="deleteProject('${p.id}')">Eliminar</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>'}
+
+function renderStats(){
+  const ps=SEAIRE_PROJECTS.read();
+  $('sCount').textContent=dbServices.filter(s=>s.active).length;
+  $('pCount').textContent=ps.length;
+  $('photoCount').textContent=ps.reduce((n,p)=>n+(p.photos||[]).length,0);
+  $('videoCount').textContent=ps.filter(p=>p.videoUrl).length;
+}
+function serviceOptions(){return dbServices.filter(s=>s.active).map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')}
+function renderProjects(){const ps=SEAIRE_PROJECTS.read();$('projectRows').innerHTML=ps.length?ps.map(p=>`<tr><td><strong>${esc(p.title)}</strong><br><small>${esc(p.date||'')}</small></td><td>${esc((dbServices.find(s=>s.id===p.service)||{}).name||p.service)}</td><td>${esc(p.location||'')}</td><td>${p.photos?.length||0} foto(s)${p.videoUrl?' · video':''}</td><td><button class="mini" onclick="editProject('${p.id}')">Editar</button> <button class="mini danger" onclick="deleteProject('${p.id}')">Eliminar</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>'}
 function newProject(){currentPhotos=[];$('projectEditor').style.display='block';$('projectForm').reset();$('projectId').value='';$('pservice').innerHTML=serviceOptions();$('ppreview').innerHTML='';$('projectFormTitle').textContent='Nuevo proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})}
 function cancelProject(){$('projectEditor').style.display='none'}
 function editProject(id){const p=SEAIRE_PROJECTS.read().find(x=>x.id===id);if(!p)return;currentPhotos=p.photos||[];$('projectEditor').style.display='block';$('projectId').value=p.id;$('ptitle').value=p.title;$('pservice').innerHTML=serviceOptions();$('pservice').value=p.service;$('plocation').value=p.location||'';$('pdate').value=p.date||'';$('pdescription').value=p.description||'';$('pvideo').value=p.videoUrl||'';renderPhotoPreview();$('projectFormTitle').textContent='Editar proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})}
@@ -112,6 +297,7 @@ $('logoFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!
 function exportConfig(){const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();URL.revokeObjectURL(a.href)}
 $('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{cfg=JSON.parse(await f.text());cfg=Object.assign(SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT),cfg);bindFields();renderServices();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.')}catch(err){alert('Archivo de configuración no válido.')}});
 function resetConfig(){if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;cfg=SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT);bindFields();renderServices();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.')}
-bindFields();renderServices();renderNav();renderLogo();renderProjects();renderStats();
+
+initSupabase();
 if(location.hash && $(location.hash.slice(1))){document.querySelector(`[data-tab="${location.hash.slice(1)}"]`)?.click()}
 </script></body></html>
