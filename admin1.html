@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEAIRE | Panel Administrativo</title>
+<style>
+:root{--bg:#061321;--side:#06111d;--card:#0d263d;--line:rgba(100,190,240,.18);--text:#f5f8fc;--muted:#a8bdd1;--blue:#1aa8ff;--green:#00d9a6;--danger:#d84a64}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}
+.layout{min-height:100vh;display:grid;grid-template-columns:270px 1fr}.sidebar{background:var(--side);border-right:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}.brand{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--blue);margin-bottom:40px}.nav a{display:block;color:#dce7f2;text-decoration:none;padding:14px 16px;border-radius:12px;margin:5px 0}.nav a:hover,.nav a.active{background:#153753}.logout{margin-top:auto;background:#153753;border:0;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}.main{padding:34px;max-width:1500px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h1{font-size:34px;margin:0}.btn{border:0;border-radius:10px;padding:12px 18px;background:linear-gradient(135deg,var(--blue),#1684ff);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#153753}.btn.danger{background:#542033}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}.stat{padding:20px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:34px;margin-top:5px}.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{background:#102c45;border:1px solid var(--line);color:#dce7f2;padding:11px 14px;border-radius:10px;cursor:pointer}.tab.active{background:linear-gradient(135deg,#1684ff,#18b6ff);border-color:transparent}.section{display:none}.section.active{display:block}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px;width:100%}.field textarea{min-height:110px;resize:vertical}.field small{color:#8fa7bd}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}.service-row{display:grid;grid-template-columns:70px 1fr 2fr 100px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.service-row input{background:#061522;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px}.toggle{display:flex;gap:8px;align-items:center;color:#b9cce0}.check{width:18px!important;height:18px}.project-table{width:100%;border-collapse:collapse}.project-table th,.project-table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}.project-table th{color:#9fc0d9}.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.mini.danger{background:#4a1d2a}.preview{display:flex;gap:10px;flex-wrap:wrap}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.drop{border:1px dashed #2a678e;padding:16px;border-radius:12px}.toast{position:fixed;right:25px;bottom:25px;background:#0c2d43;border:1px solid #2c759d;padding:14px 18px;border-radius:12px;display:none;z-index:99}.toast.show{display:block}.danger-note{background:#392c12;border-color:#72591e}.jsonbox{font-family:Consolas,monospace;min-height:180px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.stats{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service-row{grid-template-columns:60px 1fr}.service-row>*:nth-child(3){grid-column:1/-1}}
+</style></head>
+<body>
+<div class="layout">
+<aside class="sidebar"><div class="brand">SEAIRE</div><nav class="nav">
+<a class="active" href="#dashboard" data-tab="dashboard">▦ Dashboard</a>
+<a href="#empresa" data-tab="empresa">◉ Empresa</a><a href="#inicio" data-tab="inicio">⌂ Inicio</a>
+<a href="#nosotros" data-tab="nosotros">◎ Nosotros</a><a href="#servicios" data-tab="servicios">⚡ Servicios</a>
+<a href="#proyectos" data-tab="proyectos">▣ Proyectos</a><a href="#cotizacion" data-tab="cotizacion">✉ Cotización</a>
+<a href="#contacto" data-tab="contacto">☎ Contacto</a><a href="#respaldo" data-tab="respaldo">↕ Respaldo</a>
+</nav><button class="logout" onclick="location.href='index.html'">Ver página pública</button></aside>
+<main class="main">
+<div class="top"><h1 id="pageTitle">Dashboard</h1><div><button class="btn secondary" onclick="location.href='index.html'">Ver página</button> <button class="btn" onclick="saveAll()">Guardar cambios</button></div></div>
+<div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos mantienen su galería actual.</div>
+
+<section id="dashboard" class="section active">
+<div class="stats"><div class="stat"><span>Servicios activos</span><strong id="sCount">0</strong></div><div class="stat"><span>Proyectos</span><strong id="pCount">0</strong></div><div class="stat"><span>Fotografías</span><strong id="photoCount">0</strong></div><div class="stat"><span>Videos</span><strong id="videoCount">0</strong></div></div>
+<div class="panel"><h2>¿Qué puedes administrar?</h2><div class="form-grid"><div><h3>Contenido</h3><p style="color:#a8bdd1">Textos, títulos, misión, visión, servicios, contacto, botones, pie de página y SEO.</p></div><div><h3>Proyectos</h3><p style="color:#a8bdd1">Proyectos, ubicación, fecha, descripción, fotografías y enlaces de video.</p></div></div></div>
+</section>
+
+<section id="empresa" class="section"><div class="panel"><h2>Datos de empresa y marca</h2><div class="form-grid">
+<div class="field"><label>Nombre comercial</label><input data-bind="brand.name"></div><div class="field"><label>Razón social</label><input data-bind="brand.legal"></div>
+<div class="field full"><label>Eslogan / descripción corta</label><input data-bind="brand.tagline"></div>
+<div class="field full"><label>Logo</label><div class="drop"><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Si seleccionas una imagen, se guardará en este navegador como logo de la web.</small><div class="preview" id="logoPreview"></div></div></div>
+</div></div></section>
+
+<section id="inicio" class="section"><div class="panel"><h2>Portada / Inicio</h2><div class="form-grid">
+<div class="field full"><label>Etiqueta superior</label><input data-bind="hero.badge"></div>
+<div class="field"><label>Título principal</label><input data-bind="hero.title"></div><div class="field"><label>Texto destacado</label><input data-bind="hero.highlight"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="hero.description"></textarea></div>
+<div class="field"><label>Botón principal</label><input data-bind="hero.primary"></div><div class="field"><label>Botón secundario</label><input data-bind="hero.secondary"></div>
+</div></div></section>
+
+<section id="nosotros" class="section"><div class="panel"><h2>Quiénes somos · Misión · Visión</h2><div class="form-grid">
+<div class="field"><label>Etiqueta de sección</label><input data-bind="about.eyebrow"></div><div class="field"><label>Título de sección</label><input data-bind="about.title"></div>
+<div class="field full"><label>Título “Quiénes somos”</label><input data-bind="about.whoTitle"></div>
+<div class="field full"><label>Quiénes somos</label><textarea data-bind="about.who"></textarea></div>
+<div class="field full"><label>Misión</label><textarea data-bind="about.mission"></textarea></div>
+<div class="field full"><label>Visión</label><textarea data-bind="about.vision"></textarea></div>
+</div></div></section>
+
+<section id="servicios" class="section"><div class="panel"><h2>Encabezado de servicios</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="servicesHead.eyebrow"></div><div class="field"><label>Título</label><input data-bind="servicesHead.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="servicesHead.description"></textarea></div>
+</div></div>
+<div class="panel"><h2>Servicios</h2><div id="serviceEditor"></div></div></section>
+
+<section id="proyectos" class="section"><div class="panel"><h2>Encabezado de proyectos</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="projectsHead.eyebrow"></div><div class="field"><label>Título</label><input data-bind="projectsHead.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="projectsHead.description"></textarea></div></div></div>
+<div class="panel"><h2>Proyectos publicados</h2><button class="btn" onclick="newProject()">+ Nuevo proyecto</button><div style="overflow:auto;margin-top:15px"><table class="project-table"><thead><tr><th>Proyecto</th><th>Servicio</th><th>Ubicación</th><th>Media</th><th>Acciones</th></tr></thead><tbody id="projectRows"></tbody></table></div></div>
+<div class="panel" id="projectEditor" style="display:none"><h2 id="projectFormTitle">Nuevo proyecto</h2><form id="projectForm"><input type="hidden" id="projectId"><div class="form-grid">
+<div class="field"><label>Nombre *</label><input id="ptitle" required></div><div class="field"><label>Servicio *</label><select id="pservice"></select></div>
+<div class="field"><label>Ubicación</label><input id="plocation"></div><div class="field"><label>Fecha</label><input id="pdate" type="date"></div>
+<div class="field full"><label>Descripción</label><textarea id="pdescription"></textarea></div>
+<div class="field"><label>Fotografías</label><div class="drop"><input id="pphotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><div class="preview" id="ppreview"></div></div></div>
+<div class="field"><label>Video</label><input id="pvideo" placeholder="https://youtube.com/..."></div></div>
+<div class="actions"><button type="button" class="btn secondary" onclick="cancelProject()">Cancelar</button><button class="btn">Guardar proyecto</button></div></form></div>
+</section>
+
+<section id="cotizacion" class="section"><div class="panel"><h2>Sección de cotización</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="quote.eyebrow"></div><div class="field"><label>Título</label><input data-bind="quote.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="quote.description"></textarea></div><div class="field"><label>Texto del botón</label><input data-bind="quote.button"></div>
+</div></div></section>
+
+<section id="contacto" class="section"><div class="panel"><h2>Contacto</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="contact.eyebrow"></div><div class="field"><label>Título</label><input data-bind="contact.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="contact.description"></textarea></div>
+<div class="field"><label>WhatsApp visible</label><input data-bind="contact.whatsapp"></div><div class="field"><label>Número WhatsApp internacional sin +</label><input data-bind="contact.phoneLink"></div>
+<div class="field full"><label>Correo</label><input data-bind="contact.email" type="email"></div>
+</div></div></section>
+
+<section id="respaldo" class="section"><div class="panel"><h2>SEO, navegación y respaldo</h2><div class="form-grid">
+<div class="field"><label>Título SEO</label><input data-bind="seo.title"></div><div class="field"><label>Descripción SEO</label><input data-bind="seo.description"></div>
+<div class="field"><label>Texto copyright</label><input data-bind="footer.copyright"></div>
+<div class="field full"><label>Editar navegación</label><div class="form-grid" id="navEditor"></div></div>
+</div><div class="actions"><button class="btn secondary" onclick="exportConfig()">Exportar configuración</button><label class="btn secondary" style="display:inline-flex;align-items:center;cursor:pointer">Importar configuración<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn danger" onclick="resetConfig()">Restablecer contenido original</button></div></div></section>
+</main></div><div class="toast" id="toast"></div>
+
+<script src="seaire-config.js"></script><script src="seaire-projects.js"></script>
+<script>
+let cfg=SEAIRE_CONFIG.read(), currentPhotos=[];
+const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const paths={}; function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)} function set(obj,path,val){const a=path.split('.');let o=obj;for(let i=0;i<a.length-1;i++)o=o[a[i]];o[a[a.length-1]]=val}
+function bindFields(){document.querySelectorAll('[data-bind]').forEach(e=>{const p=e.dataset.bind;e.value=get(cfg,p)??'';e.oninput=()=>set(cfg,p,e.value)});}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
+function renderServices(){const wrap=$('serviceEditor');wrap.innerHTML=cfg.services.map((s,i)=>`<div class="service-row"><input value="${esc(s.icon)}" data-s="${i}" data-k="icon"><input value="${esc(s.name)}" data-s="${i}" data-k="name"><input value="${esc(s.description)}" data-s="${i}" data-k="description"><label class="toggle"><input class="check" type="checkbox" ${s.enabled?'checked':''} data-s="${i}" data-k="enabled"> Activo</label></div>`).join('');wrap.querySelectorAll('[data-s]').forEach(e=>e.oninput=e.onchange=()=>{const i=+e.dataset.s;const k=e.dataset.k;cfg.services[i][k]=e.type==='checkbox'?e.checked:e.value});}
+function renderNav(){const labels={inicio:'Inicio',servicios:'Servicios',proyectos:'Proyectos',nosotros:'Nosotros',cotizacion:'Cotización',contacto:'Contacto',cta:'Botón'};$('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k])}"></div>`).join('');$('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value)}
+function renderLogo(){const p=$('logoPreview');p.innerHTML=cfg.brand.logo?`<img src="${cfg.brand.logo}" alt="Logo">`:''}
+function saveAll(){SEAIRE_CONFIG.write(cfg);toast('Cambios guardados. Abre la página pública para verificarlos.');renderStats();}
+document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));a.classList.add('active');document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));$(a.dataset.tab).classList.add('active');$('pageTitle').textContent=a.textContent.replace(/^[^A-Za-zÁÉÍÓÚÑ]+/,'').trim();location.hash=a.dataset.tab});
+function renderStats(){const ps=SEAIRE_PROJECTS.read();$('sCount').textContent=cfg.services.filter(s=>s.enabled).length;$('pCount').textContent=ps.length;$('photoCount').textContent=ps.reduce((n,p)=>n+(p.photos||[]).length,0);$('videoCount').textContent=ps.filter(p=>p.videoUrl).length;}
+function serviceOptions(){return cfg.services.map(s=>`<option value="${s.id}">${esc(s.icon)} ${esc(s.name)}</option>`).join('')}
+function renderProjects(){const ps=SEAIRE_PROJECTS.read();$('projectRows').innerHTML=ps.length?ps.map(p=>`<tr><td><strong>${esc(p.title)}</strong><br><small>${esc(p.date||'')}</small></td><td>${esc((cfg.services.find(s=>s.id===p.service)||{}).name||p.service)}</td><td>${esc(p.location||'')}</td><td>${p.photos?.length||0} foto(s)${p.videoUrl?' · video':''}</td><td><button class="mini" onclick="editProject('${p.id}')">Editar</button> <button class="mini danger" onclick="deleteProject('${p.id}')">Eliminar</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>'}
+function newProject(){currentPhotos=[];$('projectEditor').style.display='block';$('projectForm').reset();$('projectId').value='';$('pservice').innerHTML=serviceOptions();$('ppreview').innerHTML='';$('projectFormTitle').textContent='Nuevo proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})}
+function cancelProject(){$('projectEditor').style.display='none'}
+function editProject(id){const p=SEAIRE_PROJECTS.read().find(x=>x.id===id);if(!p)return;currentPhotos=p.photos||[];$('projectEditor').style.display='block';$('projectId').value=p.id;$('ptitle').value=p.title;$('pservice').innerHTML=serviceOptions();$('pservice').value=p.service;$('plocation').value=p.location||'';$('pdate').value=p.date||'';$('pdescription').value=p.description||'';$('pvideo').value=p.videoUrl||'';renderPhotoPreview();$('projectFormTitle').textContent='Editar proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})}
+function deleteProject(id){if(!confirm('¿Eliminar este proyecto?'))return;SEAIRE_PROJECTS.write(SEAIRE_PROJECTS.read().filter(p=>p.id!==id));renderProjects();renderStats()}
+function renderPhotoPreview(){$('ppreview').innerHTML=currentPhotos.map((x,i)=>`<div style="position:relative"><img src="${x}"><button type="button" onclick="removePhoto(${i})" style="position:absolute;right:2px;top:2px;border:0;border-radius:50%;background:#b5233b;color:#fff;width:22px;height:22px;cursor:pointer">×</button></div>`).join('')}
+function removePhoto(i){currentPhotos.splice(i,1);renderPhotoPreview()}
+function readImages(files){return Promise.all([...files].map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1280;let w=img.width,h=img.height;if(w>max){h*=max/w;w=max}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',.76))};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(f)})))}
+$('pphotos').addEventListener('change',async e=>{try{currentPhotos.push(...await readImages(e.target.files));renderPhotoPreview();e.target.value=''}catch(err){alert('No se pudo procesar la imagen.')}});
+$('projectForm').addEventListener('submit',e=>{e.preventDefault();const id=$('projectId').value||SEAIRE_PROJECTS.uid();const p={id,title:$('ptitle').value.trim(),service:$('pservice').value,location:$('plocation').value.trim(),date:$('pdate').value,description:$('pdescription').value.trim(),photos:currentPhotos,videoUrl:$('pvideo').value.trim(),updatedAt:new Date().toISOString()};try{SEAIRE_PROJECTS.write([p,...SEAIRE_PROJECTS.read().filter(x=>x.id!==id)]);renderProjects();renderStats();cancelProject();toast('Proyecto guardado.')}catch(err){alert('No se pudo guardar. Reduce el tamaño o cantidad de fotografías.')}});
+$('logoFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const arr=await readImages([f]);cfg.brand.logo=arr[0];renderLogo();toast('Logo cargado. Pulsa Guardar cambios.')}catch(err){alert('No se pudo cargar el logo.')}});
+function exportConfig(){const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();URL.revokeObjectURL(a.href)}
+$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{cfg=JSON.parse(await f.text());cfg=Object.assign(SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT),cfg);bindFields();renderServices();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.')}catch(err){alert('Archivo de configuración no válido.')}});
+function resetConfig(){if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;cfg=SEAIRE_CONFIG.clone(SEAIRE_CONFIG.DEFAULT);bindFields();renderServices();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.')}
+bindFields();renderServices();renderNav();renderLogo();renderProjects();renderStats();
+if(location.hash && $(location.hash.slice(1))){document.querySelector(`[data-tab="${location.hash.slice(1)}"]`)?.click()}
+</script></body></html>
