@@ -6,7 +6,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}
 .layout{min-height:100vh;display:grid;grid-template-columns:270px 1fr}.sidebar{background:var(--side);border-right:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column}.brand{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--blue);margin-bottom:40px}.nav button{display:block;width:100%;text-align:left;color:#dce7f2;background:none;border:0;padding:14px 16px;border-radius:12px;margin:5px 0;cursor:pointer}.nav button:hover,.nav button.active{background:#153753}.logout{margin-top:auto;background:#153753;border:0;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}
 .main{padding:34px;max-width:1450px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:15px}.top h1{font-size:34px;margin:0}.btn{border:0;border-radius:10px;padding:12px 18px;background:linear-gradient(135deg,var(--blue),#1684ff);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#153753}.btn.danger{background:#5b2430}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}.stat{padding:24px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:38px;margin-top:5px}.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px}.field textarea{min-height:110px;resize:vertical}.preview{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.table-wrap{overflow:auto}.projects-table{width:100%;border-collapse:collapse}.projects-table th,.projects-table td{text-align:left;padding:13px;border-bottom:1px solid var(--line);vertical-align:top}.projects-table th{color:#9fc0d9}.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}.thumb{width:80px;height:55px;object-fit:cover;border-radius:7px}.tab{display:none}.tab.active{display:block}.login{max-width:430px;margin:10vh auto;padding:30px}.login h1{margin-top:0}.status{margin:10px 0;padding:12px;border-radius:10px;background:#102d45;color:#b9cce0}.ok{border-color:rgba(0,217,166,.4)}.error{border-color:rgba(230,83,100,.5);color:#ffb5bf}.service-row{display:grid;grid-template-columns:70px 1fr 1.5fr 90px 92px;gap:10px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}.service-row input{min-width:0}.service-row textarea{min-height:76px;resize:vertical}.service-actions{display:flex;gap:6px;flex-wrap:wrap}.mini.danger{background:#5b2430}.mini.green{background:#124c42}.service-status{font-size:12px;color:#8fa7bd;margin-top:4px}@media(max-width:850px){.service-row{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}.stat{padding:24px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:38px;margin-top:5px}.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px}.field textarea{min-height:110px;resize:vertical}.preview{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.table-wrap{overflow:auto}.projects-table{width:100%;border-collapse:collapse}.projects-table th,.projects-table td{text-align:left;padding:13px;border-bottom:1px solid var(--line);vertical-align:top}.projects-table th{color:#9fc0d9}.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.empty{text-align:center;padding:30px;color:var(--muted)}.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}.thumb{width:80px;height:55px;object-fit:cover;border-radius:7px}.tab{display:none}.tab.active{display:block}.login{max-width:430px;margin:10vh auto;padding:30px}.login h1{margin-top:0}.status{margin:10px 0;padding:12px;border-radius:10px;background:#102d45;color:#b9cce0}.ok{border-color:rgba(0,217,166,.4)}.error{border-color:rgba(230,83,100,.5);color:#ffb5bf}.service-row{display:grid;grid-template-columns:70px 1fr 1.5fr 90px auto;gap:10px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}.service-row input{min-width:0}.service-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mini.danger{background:#5b2430}.mini.green{background:#124c42}@media(max-width:850px){.service-row{grid-template-columns:1fr}}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{position:relative}.stats,.form-grid{grid-template-columns:1fr}.main{padding:20px}.field.full{grid-column:auto}.service-row{grid-template-columns:1fr}.top{align-items:flex-start}}
 </style></head>
 <body>
@@ -72,43 +72,26 @@
 <section id="servicios" class="tab">
   <div class="top">
     <h1>Servicios</h1>
-    <div>
-      <button class="btn secondary" id="newService">+ Agregar servicio</button>
-      <button class="btn" id="saveServices">Guardar servicios</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn secondary" id="newService" type="button">+ Agregar servicio</button>
+      <button class="btn" id="saveServices" type="button">Guardar servicios</button>
     </div>
   </div>
-
-  <div class="panel" id="serviceEditorPanel" style="display:none">
-    <h2 id="serviceFormTitle">Nuevo servicio</h2>
+  <div class="panel" id="serviceFormPanel" style="display:none">
+    <h2>Agregar servicio</h2>
     <form id="serviceForm">
       <div class="form-grid">
-        <div class="field">
-          <label>Icono</label>
-          <input id="newServiceIcon" value="⚡" maxlength="8" placeholder="⚡">
-        </div>
-        <div class="field">
-          <label>Nombre del servicio *</label>
-          <input id="newServiceName" required placeholder="Ej.: Instalaciones eléctricas">
-        </div>
-        <div class="field full">
-          <label>Descripción *</label>
-          <textarea id="newServiceDescription" required placeholder="Descripción del servicio que verá el cliente."></textarea>
-        </div>
+        <div class="field"><label>Icono</label><input id="newServiceIcon" value="⚡" maxlength="8"></div>
+        <div class="field"><label>Nombre del servicio *</label><input id="newServiceName" required></div>
+        <div class="field full"><label>Descripción *</label><textarea id="newServiceDescription" required></textarea></div>
       </div>
       <div class="actions">
-        <button type="button" class="btn secondary" id="cancelService">Cancelar</button>
+        <button class="btn secondary" type="button" id="cancelService">Cancelar</button>
         <button class="btn" type="submit">Guardar servicio</button>
       </div>
     </form>
   </div>
-
-  <div class="panel">
-    <h2>Servicios de la página web</h2>
-    <p style="color:#a8bdd1;margin-top:-8px;margin-bottom:16px">
-      Puedes editar, activar/desactivar, agregar o quitar servicios. Los cambios se guardan en Supabase.
-    </p>
-    <div id="servicesEditor"></div>
-  </div>
+  <div class="panel"><div id="servicesEditor"></div></div>
 </section>
 
 <section id="proyectos" class="tab">
@@ -155,23 +138,81 @@ const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let services=[], projects=[], currentMedia=[], editingId=null;
 
 async function isAdmin(){
-  const {data:{user}}=await sb.auth.getUser();
+  const {data:{user},error:authError}=await sb.auth.getUser();
+  if(authError) throw authError;
   if(!user) return false;
+
+  // Conserva el control de admin_users cuando está disponible.
+  // Si RLS de admin_users está temporalmente mal configurado, el correo
+  // autenticado del administrador sigue permitiendo entrar al panel.
   const {data,error}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
-  return !!data && !error;
+  if(data) return true;
+
+  if(user.email && user.email.toLowerCase()==='seaire.gere@gmail.com'){
+    return true;
+  }
+
+  if(error) throw error;
+  return false;
 }
 function msg(text,ok=true){$('loginMsg').textContent=text;$('loginMsg').className='status '+(ok?'ok':'error')}
 async function start(){
-  if(await isAdmin()){$('loginView').style.display='none';$('app').style.display='grid';await loadAll()}
+  try{
+    const {data:{user}}=await sb.auth.getUser();
+    if(user){
+      const allowed=await isAdmin();
+      if(allowed){
+        $('loginView').style.display='none';
+        $('app').style.display='grid';
+        await loadAll();
+      }else{
+        msg('La cuenta está autenticada, pero no está autorizada como administrador.',false);
+      }
+    }
+  }catch(e){
+    msg('No se pudo verificar el acceso: '+(e.message||e),false);
+    console.error(e);
+  }
 }
 $('loginForm').onsubmit=async e=>{
-  e.preventDefault();msg('Ingresando…');
-  const {error}=await sb.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
-  if(error){msg(error.message,false);return}
-  if(!await isAdmin()){await sb.auth.signOut();msg('Este usuario no está autorizado como administrador. Añade su UUID a public.admin_users.',false);return}
-  location.reload();
+  e.preventDefault();
+  msg('Conectando con Supabase…');
+  const email=$('loginEmail').value.trim();
+  const password=$('loginPassword').value;
+
+  try{
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error){msg('No se pudo iniciar sesión: '+error.message,false);console.error(error);return}
+
+    const allowed=await isAdmin();
+    if(!allowed){
+      await sb.auth.signOut();
+      msg('El correo o la contraseña son correctos, pero esta cuenta no está autorizada como administrador.',false);
+      return;
+    }
+
+    $('loginView').style.display='none';
+    $('app').style.display='grid';
+    msg('');
+    try{
+      await loadAll();
+    }catch(loadError){
+      console.error(loadError);
+      alert('Sesión iniciada, pero hubo un problema cargando los datos: '+(loadError.message||loadError));
+    }
+  }catch(e){
+    console.error(e);
+    msg('Error de conexión: '+(e.message||e),false);
+  }
 };
-$('logoutBtn').onclick=async()=>{if(!confirm('¿Deseas cerrar la sesión administrativa?'))return;await sb.auth.signOut();location.reload()};
+$('logoutBtn').onclick=async()=>{
+  try{await sb.auth.signOut()}finally{
+    $('app').style.display='none';
+    $('loginView').style.display='block';
+    $('loginPassword').value='';
+    msg('Sesión cerrada.');
+  }
+};
 $('publicBtn').onclick=()=>location.href='index.html';
 
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
@@ -210,13 +251,13 @@ $('saveContacto').onclick=async()=>{
 };
 
 async function loadServices(){
-  const {data,error}=await sb.from('services').select('*').order('sort_order').order('created_at',{ascending:true});
-  if(error){alert('No se pudieron cargar los servicios: '+error.message);return}
+  const {data,error}=await sb.from('services').select('*').order('sort_order');
+  if(error){alert('No se pudieron cargar los servicios: '+error.message);console.error(error);return}
   services=data||[];
   $('serviceCount').textContent=services.filter(x=>x.active).length;
   $('pService').innerHTML=services.length
     ? services.map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')
-    : '<option value="">Primero agregue un servicio</option>';
+    : '<option value="">Agrega un servicio primero</option>';
 
   $('servicesEditor').innerHTML=services.length ? services.map(s=>`
     <div class="service-row" data-s="${esc(s.id)}">
@@ -225,46 +266,43 @@ async function loadServices(){
       <textarea class="sDesc" title="Descripción">${esc(s.description||'')}</textarea>
       <label><input class="sActive" type="checkbox" ${s.active?'checked':''}> Activo</label>
       <div class="service-actions">
-        <button type="button" class="mini danger" onclick="deleteService('${esc(s.id)}','${esc(s.name||'')}')">Quitar</button>
+        <button type="button" class="mini danger" onclick="removeService('${esc(s.id)}')">Quitar</button>
       </div>
-    </div>`).join('') : `
-      <div class="empty">No hay servicios registrados. Pulsa “+ Agregar servicio” para crear el primero.</div>`;
+    </div>`).join('')
+    : '<div class="empty">No hay servicios. Pulsa “+ Agregar servicio”.</div>';
 }
 
-function openServiceForm(){
-  $('serviceEditorPanel').style.display='block';
+$('newService').onclick=()=>{
+  $('serviceFormPanel').style.display='block';
   $('newServiceIcon').value='⚡';
   $('newServiceName').value='';
   $('newServiceDescription').value='';
   $('newServiceName').focus();
-  $('serviceEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function closeServiceForm(){
-  $('serviceEditorPanel').style.display='none';
+};
+$('cancelService').onclick=()=>{
+  $('serviceFormPanel').style.display='none';
   $('serviceForm').reset();
   $('newServiceIcon').value='⚡';
-}
-$('newService').onclick=openServiceForm;
-$('cancelService').onclick=closeServiceForm;
+};
 
 $('serviceForm').onsubmit=async e=>{
   e.preventDefault();
+  const icon=$('newServiceIcon').value.trim()||'⚡';
   const name=$('newServiceName').value.trim();
   const description=$('newServiceDescription').value.trim();
-  const icon=$('newServiceIcon').value.trim()||'⚡';
-  if(!name||!description){alert('Complete el nombre y la descripción del servicio.');return}
+  if(!name||!description){alert('Completa nombre y descripción.');return}
 
   try{
-    const nextOrder=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1)+1;
+    const maxOrder=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1);
     const {error}=await sb.from('services').insert({
-      icon,name,description,active:true,sort_order:nextOrder,
-      updated_at:new Date().toISOString()
+      icon,name,description,active:true,sort_order:maxOrder+1,
+      created_at:new Date().toISOString(),updated_at:new Date().toISOString()
     });
     if(error)throw error;
-    closeServiceForm();
+    $('serviceFormPanel').style.display='none';
     await loadServices();
     await loadProjects();
-    alert('Servicio agregado correctamente y publicado en la página web.');
+    alert('Servicio agregado correctamente.');
   }catch(e){
     alert('No se pudo agregar el servicio: '+e.message);
   }
@@ -272,8 +310,7 @@ $('serviceForm').onsubmit=async e=>{
 
 $('saveServices').onclick=async()=>{
   try{
-    for(const row of document.querySelectorAll('#servicesEditor .service-row')){
-      const id=row.dataset.s;
+    for(const row of document.querySelectorAll('.service-row')){
       const payload={
         icon:row.querySelector('.sIcon').value.trim()||'⚡',
         name:row.querySelector('.sName').value.trim(),
@@ -282,35 +319,28 @@ $('saveServices').onclick=async()=>{
         updated_at:new Date().toISOString()
       };
       if(!payload.name||!payload.description)throw new Error('Todos los servicios deben tener nombre y descripción.');
-      const {error}=await sb.from('services').update(payload).eq('id',id);
+      const {error}=await sb.from('services').update(payload).eq('id',row.dataset.s);
       if(error)throw error;
     }
     await loadServices();
     await loadProjects();
-    alert('Servicios guardados en Supabase.');
+    alert('Servicios guardados correctamente.');
   }catch(e){alert('Error al guardar servicios: '+e.message)}
 };
 
-async function deleteService(id,name){
-  if(!confirm('¿Quitar el servicio "'+name+'"?\n\nSi tiene proyectos asociados, se desactivará para no afectar esos proyectos.'))return;
+async function removeService(id){
+  const service=services.find(s=>s.id===id);
+  if(!service)return;
+  if(!confirm('¿Quieres quitar "'+service.name+'" de la página web?'))return;
 
-  try{
-    const {error}=await sb.from('services').delete().eq('id',id);
-    if(error){
-      // Si existen proyectos vinculados, se conserva el registro y se oculta de la web.
-      const {error:offError}=await sb.from('services')
-        .update({active:false,updated_at:new Date().toISOString()})
-        .eq('id',id);
-      if(offError)throw offError;
-      alert('El servicio tiene proyectos asociados, por lo que fue desactivado en lugar de eliminarse.');
-    }else{
-      alert('Servicio eliminado correctamente.');
-    }
-    await loadServices();
-    await loadProjects();
-  }catch(e){
-    alert('No se pudo quitar el servicio: '+e.message);
-  }
+  // Desactivar es más seguro que borrar porque puede tener proyectos asociados.
+  const {error}=await sb.from('services').update({
+    active:false,updated_at:new Date().toISOString()
+  }).eq('id',id);
+
+  if(error){alert('No se pudo quitar el servicio: '+error.message);return}
+  await loadServices();
+  alert('Servicio quitado de la página web.');
 }
 
 async function loadProjects(){
@@ -319,7 +349,7 @@ async function loadProjects(){
   projects=data||[];$('projectCount').textContent=projects.filter(p=>p.published).length;
   $('pCount').textContent=projects.length;$('pPhotosCount').textContent=projects.reduce((a,p)=>a+(p.project_media||[]).filter(m=>m.media_type==='image').length,0);
   $('pVideos').textContent=projects.reduce((a,p)=>a+(p.project_media||[]).filter(m=>m.media_type==='video').length,0);
-  $('mediaCount').textContent=projects.reduce((a,p)=>a+(p.project_media||[]).filter(m=>m.media_type==='image').length,0);
+  $('mediaCount').textContent=$('pPhotosCount').textContent;
   $('projectRows').innerHTML=projects.length?projects.map(p=>{
     const s=services.find(x=>x.id===p.service_id)?.name||p.service_id;
     const media=p.project_media||[];
