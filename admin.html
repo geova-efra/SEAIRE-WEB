@@ -1,80 +1,708 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SEAIRE | Panel Administrativo</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#07111f;color:#f5f8fc}
-input,textarea,select,button{font:inherit}.top{height:70px;border-bottom:1px solid #183650;padding:0 4%;display:flex;align-items:center;justify-content:space-between;background:#07111f;position:sticky;top:0;z-index:5}
-.brand{font-size:24px;font-weight:900;letter-spacing:2px}.brand span{color:#18b6ff}.top a{color:#b9cad9;text-decoration:none;margin-right:10px}
-.wrap{width:min(1150px,94%);margin:28px auto}.panel{background:#0b1d30;border:1px solid #183650;border-radius:18px;padding:25px}.login{max-width:430px;margin:70px auto}.hidden{display:none}
-.head{display:flex;justify-content:space-between;align-items:center;gap:12px}.primary{background:#18b6ff;color:#061522;border:0;padding:11px 16px;border-radius:9px;font-weight:900;cursor:pointer}
-.secondary,.danger{background:#102940;color:#fff;border:1px solid #24445d;padding:9px 12px;border-radius:8px;cursor:pointer}.danger{color:#ffb0b0}
-.form{display:grid;gap:13px;margin-top:20px}.form label{font-size:13px;color:#b1c1d0}.form input,.form select,.form textarea{width:100%;margin-top:6px;background:#061522;color:#fff;border:1px solid #24445d;border-radius:8px;padding:11px}.form textarea{min-height:120px;resize:vertical}
-.list{display:grid;gap:12px;margin-top:20px}.item{display:grid;grid-template-columns:100px 1fr auto;gap:14px;align-items:center;padding:14px;background:#0d2237;border:1px solid #1b3a53;border-radius:13px}
-.thumb{height:78px;background:#11304a;border-radius:8px;overflow:hidden;display:grid;place-items:center;font-size:28px}.thumb img{width:100%;height:100%;object-fit:cover}.item small{color:#90a8bb}.actions{display:flex;gap:7px;flex-wrap:wrap}
-.status{display:inline-block;margin-top:5px;font-size:11px;padding:4px 7px;border-radius:99px;background:#17364d;color:#7ddcff}.preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.preview-item{position:relative;width:120px}.preview-item img{width:120px;height:82px;object-fit:cover;border-radius:8px;border:1px solid #24445d}.remove{position:absolute;right:3px;top:3px;border:0;background:#061522dd;color:#fff;border-radius:50%;width:23px;height:23px;cursor:pointer}
-.video-preview{margin-top:10px;color:#8fb1c7;font-size:13px}.msg{margin:10px 0;color:#ffb3b3;white-space:pre-wrap}.ok{color:#7ff0c2}.help{padding:12px;background:#0e2539;border-radius:8px;color:#9fb3c5;font-size:12px;line-height:1.5}.check{display:flex!important;align-items:center;gap:8px}.check input{width:auto!important;margin:0!important}
-.tabs{display:flex;gap:8px;margin:25px 0 0;flex-wrap:wrap}.tab{background:#102940;color:#dce9f4;border:1px solid #24445d;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:800}.tab.active{background:#18b6ff;color:#061522}
-.service-item{display:grid;grid-template-columns:60px 1fr auto;gap:14px;align-items:center;padding:14px;background:#0d2237;border:1px solid #1b3a53;border-radius:13px}.service-icon{font-size:30px;text-align:center}.service-actions{display:flex;gap:7px;flex-wrap:wrap}
-@media(max-width:760px){.item{grid-template-columns:70px 1fr}.actions{grid-column:1/-1}.head{align-items:flex-start;flex-direction:column}.service-item{grid-template-columns:50px 1fr}.service-actions{grid-column:1/-1}}
+:root{--bg:#061321;--side:#06111d;--card:#0d263d;--line:rgba(100,190,240,.18);--text:#f5f8fc;--muted:#a8bdd1;--blue:#1aa8ff;--green:#00d9a6;--danger:#d84a64}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.hidden{display:none!important}
+.layout{min-height:100vh;display:grid;grid-template-columns:270px 1fr}
+.sidebar{background:var(--side);border-right:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{font-size:30px;font-weight:900;letter-spacing:2px;color:var(--blue);margin-bottom:40px}
+.nav a{display:block;color:#dce7f2;text-decoration:none;padding:14px 16px;border-radius:12px;margin:5px 0}
+.nav a:hover,.nav a.active{background:#153753}
+.sidebar-bottom{margin-top:auto;display:grid;gap:9px}
+.logout,.public-link{display:block;width:100%;text-align:center;text-decoration:none;background:#153753;border:0;color:white;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}
+.logout{background:#542033}
+.main{padding:34px;max-width:1500px;width:100%;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:15px}
+.top h1{font-size:34px;margin:0}
+.btn{border:0;border-radius:10px;padding:12px 18px;background:linear-gradient(135deg,var(--blue),#1684ff);color:white;font-weight:800;cursor:pointer}
+.btn.secondary{background:#153753}.btn.danger{background:#542033}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat,.panel{background:linear-gradient(145deg,#0d263d,#0a1c2e);border:1px solid var(--line);border-radius:18px}
+.stat{padding:20px}.stat span{color:#9fc0d9}.stat strong{display:block;font-size:34px;margin-top:5px}
+.panel{padding:24px;margin-bottom:20px}.panel h2{margin:0 0 18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:700;color:#c9d8e7;font-size:14px}
+.field input,.field select,.field textarea{background:#061522;border:1px solid var(--line);color:white;border-radius:10px;padding:12px;width:100%}
+.field textarea{min-height:110px;resize:vertical}.field small{color:#8fa7bd}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.notice{padding:14px;border-radius:10px;background:#102d45;border:1px solid var(--line);color:#b9cce0;margin-bottom:18px}
+.section{display:none}.section.active{display:block}
+.service-row{display:grid;grid-template-columns:70px 1fr 2fr 100px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.service-row input{background:#061522;border:1px solid var(--line);color:#fff;border-radius:9px;padding:10px}
+.toggle{display:flex;gap:8px;align-items:center;color:#b9cce0}.check{width:18px!important;height:18px}
+.project-table{width:100%;border-collapse:collapse}.project-table th,.project-table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}.project-table th{color:#9fc0d9}
+.mini{padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:#102c45;color:white;cursor:pointer}.mini.danger{background:#4a1d2a}
+.preview{display:flex;gap:10px;flex-wrap:wrap}.preview img{width:110px;height:80px;object-fit:cover;border-radius:8px}.drop{border:1px dashed #2a678e;padding:16px;border-radius:12px}
+.toast{position:fixed;right:25px;bottom:25px;background:#0c2d43;border:1px solid #2c759d;padding:14px 18px;border-radius:12px;display:none;z-index:99}.toast.show{display:block}
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg)}
+.login-box{width:min(430px,100%);background:#0b1d30;border:1px solid #183650;border-radius:18px;padding:30px}
+.login-box h2{margin-top:0}.login-box p{color:#aebfd0}.login-form{display:grid;gap:13px}.login-form label{font-size:13px;color:#b1c1d0}
+.login-form input{width:100%;margin-top:6px;background:#061522;color:#fff;border:1px solid #24445d;border-radius:8px;padding:12px}
+.login-msg{margin-top:12px;color:#ffb3b3;white-space:pre-wrap}.ok{color:#7ff0c2}
+.auth-loading{color:#9fb3c5;text-align:center}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.stats{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service-row{grid-template-columns:60px 1fr}.service-row>*:nth-child(3){grid-column:1/-1}}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand">SEA<span>IRE</span> · ADMIN</div><div><a href="index.html">Ver página pública</a><button class="secondary" id="logout" type="button">Cerrar sesión</button></div></header>
-<div class="wrap">
-<div id="login" class="panel login hidden"><h2>Acceso administrativo</h2><p style="color:#aebfd0">Ingresa con el correo y contraseña registrados en Supabase.</p>
-<form id="loginForm" class="form"><label>Correo electrónico<input id="email" type="email" autocomplete="username" required></label><label>Contraseña<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" id="loginBtn" type="submit">Ingresar</button></form><div id="loginMsg" class="msg"></div></div>
-<div id="app" class="panel hidden">
-<div class="head"><div><div style="color:#18b6ff;font-size:12px;font-weight:900;letter-spacing:2px">ADMINISTRACIÓN</div><h1>Panel SEAIRE</h1></div><button class="primary" onclick="newProject()" type="button">+ Agregar proyecto</button></div>
-<div id="msg" class="msg"></div>
-<div class="tabs"><button class="tab active" id="tabProjects" type="button" onclick="showSection('projectsSection')">Proyectos</button><button class="tab" id="tabServices" type="button" onclick="showSection('servicesSection')">Servicios</button></div>
-<section id="projectsSection"><div id="list" class="list"></div>
-<div id="editor" class="hidden"><hr style="border-color:#183650;margin:25px 0"><h2 id="formTitle">Nuevo proyecto</h2>
-<form id="form" class="form"><input type="hidden" id="pid"><label>Nombre del proyecto<input id="title" required placeholder="Ej. Instalación de transformador trifásico 500 kVA"></label><label>Servicio<select id="service"></select></label><label>Ubicación<input id="location" placeholder="Ej. La Joya de los Sachas, Orellana"></label><label>Año<input id="year" type="number" value="2026"></label><label>Descripción<textarea id="description" placeholder="Alcance, trabajos ejecutados, equipos, resultados, etc."></textarea></label>
-<label>Fotografías del proyecto<input id="photoFiles" type="file" accept="image/*" multiple><div class="help">Selecciona una o varias fotografías. Se subirán a Supabase Storage.</div><div id="preview" class="preview"></div></label>
-<label>Video del proyecto (opcional)<input id="videoFile" type="file" accept="video/*"><div id="videoPreview" class="video-preview"></div></label><label class="check"><input id="published" type="checkbox" checked> Publicar para todos los visitantes</label>
-<div><button class="primary" type="submit" id="saveBtn">Guardar y publicar</button><button type="button" class="secondary" onclick="cancel()">Cancelar</button></div></form></div></section>
-<section id="servicesSection" class="hidden"><div class="head" style="margin-top:25px"><div><h2>Servicios de la página</h2><p style="color:#9fb3c5">Agrega, edita, activa o desactiva los servicios que aparecen en la web pública.</p></div><button class="primary" type="button" onclick="newService()">+ Agregar servicio</button></div>
-<div id="serviceEditor" class="panel hidden" style="margin-top:18px"><h3 id="serviceFormTitle">Nuevo servicio</h3><form id="serviceForm" class="form"><input type="hidden" id="sid"><label>Nombre<input id="sname" required placeholder="Ej. Estudios eléctricos"></label><label>Ícono<input id="sicon" value="⚡" maxlength="8"></label><label>Descripción<textarea id="sdescription" required placeholder="Descripción del servicio"></textarea></label><label class="check"><input id="senabled" type="checkbox" checked> Servicio activo en la página pública</label><div><button class="primary" type="submit" id="saveServiceBtn">Guardar servicio</button><button class="secondary" type="button" onclick="cancelService()">Cancelar</button></div></form></div>
-<div id="serviceList" class="list"></div></section>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="brand">SEAIRE</div>
+    <h2>Acceso administrativo</h2>
+    <p>Ingresa con el correo y contraseña registrados en Supabase.</p>
+    <form id="loginForm" class="login-form">
+      <label>Correo electrónico
+        <input id="email" type="email" autocomplete="username" required>
+      </label>
+      <label>Contraseña
+        <input id="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn" id="loginBtn" type="submit">Ingresar</button>
+    </form>
+    <div id="loginMsg" class="login-msg"></div>
+  </div>
+</div>
+
+<div id="authLoading" class="login-screen hidden">
+  <div class="auth-loading">Comprobando sesión...</div>
+</div>
+
+<div id="adminApp" class="hidden">
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">SEAIRE</div>
+  <nav class="nav">
+    <a class="active" href="#dashboard" data-tab="dashboard">▦ Dashboard</a>
+    <a href="#empresa" data-tab="empresa">◉ Empresa</a>
+    <a href="#inicio" data-tab="inicio">⌂ Inicio</a>
+    <a href="#nosotros" data-tab="nosotros">◎ Nosotros</a>
+    <a href="#servicios" data-tab="servicios">⚡ Servicios</a>
+    <a href="#proyectos" data-tab="proyectos">▣ Proyectos</a>
+    <a href="#cotizacion" data-tab="cotizacion">✉ Cotización</a>
+    <a href="#contacto" data-tab="contacto">☎ Contacto</a>
+    <a href="#respaldo" data-tab="respaldo">↕ Respaldo</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a class="public-link" href="index.html">Ver página pública</a>
+    <button class="logout" id="logout" type="button">Cerrar sesión</button>
+  </div>
+</aside>
+
+<main class="main">
+<div class="top">
+  <h1 id="pageTitle">Dashboard</h1>
+  <div>
+    <button class="btn secondary" onclick="location.href='index.html'">Ver página</button>
+    <button class="btn" onclick="saveAll()">Guardar cambios</button>
+  </div>
+</div>
+
+<div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos y servicios se guardan en Supabase.</div>
+
+<section id="dashboard" class="section active">
+<div class="stats">
+  <div class="stat"><span>Servicios activos</span><strong id="sCount">0</strong></div>
+  <div class="stat"><span>Proyectos</span><strong id="pCount">0</strong></div>
+  <div class="stat"><span>Fotografías</span><strong id="photoCount">0</strong></div>
+  <div class="stat"><span>Videos</span><strong id="videoCount">0</strong></div>
+</div>
+<div class="panel"><h2>¿Qué puedes administrar?</h2><div class="form-grid">
+  <div><h3>Contenido</h3><p style="color:#a8bdd1">Textos, títulos, misión, visión, servicios, contacto, botones, pie de página y SEO.</p></div>
+  <div><h3>Proyectos</h3><p style="color:#a8bdd1">Proyectos, ubicación, fecha, descripción, fotografías y enlaces de video.</p></div>
 </div></div>
+</section>
+
+<section id="empresa" class="section"><div class="panel"><h2>Datos de empresa y marca</h2><div class="form-grid">
+<div class="field"><label>Nombre comercial</label><input data-bind="brand.name"></div>
+<div class="field"><label>Razón social</label><input data-bind="brand.legal"></div>
+<div class="field full"><label>Eslogan / descripción corta</label><input data-bind="brand.tagline"></div>
+<div class="field full"><label>Logo</label><div class="drop"><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Si seleccionas una imagen, se guardará en este navegador como logo de la web.</small><div class="preview" id="logoPreview"></div></div></div>
+</div></div></section>
+
+<section id="inicio" class="section"><div class="panel"><h2>Portada / Inicio</h2><div class="form-grid">
+<div class="field full"><label>Etiqueta superior</label><input data-bind="hero.badge"></div>
+<div class="field"><label>Título principal</label><input data-bind="hero.title"></div>
+<div class="field"><label>Texto destacado</label><input data-bind="hero.highlight"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="hero.description"></textarea></div>
+<div class="field"><label>Botón principal</label><input data-bind="hero.primary"></div>
+<div class="field"><label>Botón secundario</label><input data-bind="hero.secondary"></div>
+</div></div></section>
+
+<section id="nosotros" class="section"><div class="panel"><h2>Quiénes somos · Misión · Visión</h2><div class="form-grid">
+<div class="field"><label>Etiqueta de sección</label><input data-bind="about.eyebrow"></div>
+<div class="field"><label>Título de sección</label><input data-bind="about.title"></div>
+<div class="field full"><label>Título “Quiénes somos”</label><input data-bind="about.whoTitle"></div>
+<div class="field full"><label>Quiénes somos</label><textarea data-bind="about.who"></textarea></div>
+<div class="field full"><label>Misión</label><textarea data-bind="about.mission"></textarea></div>
+<div class="field full"><label>Visión</label><textarea data-bind="about.vision"></textarea></div>
+</div></div></section>
+
+<section id="servicios" class="section">
+<div class="panel"><h2>Encabezado de servicios</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="servicesHead.eyebrow"></div>
+<div class="field"><label>Título</label><input data-bind="servicesHead.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="servicesHead.description"></textarea></div>
+</div></div>
+<div class="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0">Servicios</h2>
+    <button class="btn" type="button" onclick="newService()">+ Agregar servicio</button>
+  </div>
+  <div id="serviceEditor" class="panel hidden" style="margin-top:18px">
+    <h3 id="serviceFormTitle">Nuevo servicio</h3>
+    <form id="serviceForm" class="form-grid">
+      <input type="hidden" id="sid">
+      <div class="field"><label>Nombre *</label><input id="sname" required></div>
+      <div class="field"><label>Ícono</label><input id="sicon" value="⚡" maxlength="8"></div>
+      <div class="field full"><label>Descripción *</label><textarea id="sdescription" required></textarea></div>
+      <label class="toggle"><input id="senabled" class="check" type="checkbox" checked> Servicio activo en la página pública</label>
+      <div class="actions field full"><button class="btn secondary" type="button" onclick="cancelService()">Cancelar</button><button class="btn" type="submit" id="saveServiceBtn">Guardar servicio</button></div>
+    </form>
+  </div>
+  <div id="serviceList"></div>
+</div>
+</section>
+
+<section id="proyectos" class="section">
+<div class="panel"><h2>Encabezado de proyectos</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="projectsHead.eyebrow"></div>
+<div class="field"><label>Título</label><input data-bind="projectsHead.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="projectsHead.description"></textarea></div>
+</div></div>
+<div class="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <h2 style="margin:0">Proyectos publicados</h2>
+    <button class="btn" onclick="newProject()">+ Nuevo proyecto</button>
+  </div>
+  <div style="overflow:auto;margin-top:15px">
+    <table class="project-table"><thead><tr><th>Proyecto</th><th>Servicio</th><th>Ubicación</th><th>Media</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="projectRows"></tbody></table>
+  </div>
+</div>
+<div class="panel" id="projectEditor" style="display:none">
+<h2 id="projectFormTitle">Nuevo proyecto</h2>
+<form id="projectForm"><input type="hidden" id="projectId"><div class="form-grid">
+<div class="field"><label>Nombre *</label><input id="ptitle" required></div>
+<div class="field"><label>Servicio *</label><select id="pservice"></select></div>
+<div class="field"><label>Ubicación</label><input id="plocation"></div>
+<div class="field"><label>Año</label><input id="pyear" type="number" value="2026"></div>
+<div class="field full"><label>Descripción</label><textarea id="pdescription"></textarea></div>
+<div class="field"><label>Fotografías</label><div class="drop"><input id="pphotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Máximo 15 MB por fotografía.</small><div class="preview" id="ppreview"></div></div></div>
+<div class="field"><label>Video</label><div class="drop"><input id="pvideo" type="file" accept="video/*"><small>Máximo 100 MB. Se almacena en Supabase Storage.</small><div id="videoStatus"></div></div></div>
+<label class="toggle"><input id="ppublished" class="check" type="checkbox" checked> Publicar para todos los visitantes</label>
+</div>
+<div class="actions"><button type="button" class="btn secondary" onclick="cancelProject()">Cancelar</button><button class="btn" id="projectSaveBtn">Guardar proyecto</button></div>
+</form>
+</div>
+</section>
+
+<section id="cotizacion" class="section"><div class="panel"><h2>Sección de cotización</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="quote.eyebrow"></div>
+<div class="field"><label>Título</label><input data-bind="quote.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="quote.description"></textarea></div>
+<div class="field"><label>Texto del botón</label><input data-bind="quote.button"></div>
+</div></div></section>
+
+<section id="contacto" class="section"><div class="panel"><h2>Contacto</h2><div class="form-grid">
+<div class="field"><label>Etiqueta</label><input data-bind="contact.eyebrow"></div>
+<div class="field"><label>Título</label><input data-bind="contact.title"></div>
+<div class="field full"><label>Descripción</label><textarea data-bind="contact.description"></textarea></div>
+<div class="field"><label>WhatsApp visible</label><input data-bind="contact.whatsapp"></div>
+<div class="field"><label>Número WhatsApp internacional sin +</label><input data-bind="contact.phoneLink"></div>
+<div class="field full"><label>Correo</label><input data-bind="contact.email" type="email"></div>
+</div></div></section>
+
+<section id="respaldo" class="section"><div class="panel"><h2>SEO, navegación y respaldo</h2><div class="form-grid">
+<div class="field"><label>Título SEO</label><input data-bind="seo.title"></div>
+<div class="field"><label>Descripción SEO</label><input data-bind="seo.description"></div>
+<div class="field"><label>Texto copyright</label><input data-bind="footer.copyright"></div>
+<div class="field full"><label>Editar navegación</label><div class="form-grid" id="navEditor"></div></div>
+</div><div class="actions">
+<button class="btn secondary" onclick="exportConfig()">Exportar configuración</button>
+<label class="btn secondary" style="display:inline-flex;align-items:center;cursor:pointer">Importar configuración<input id="importFile" type="file" accept="application/json" hidden></label>
+<button class="btn danger" onclick="resetConfig()">Restablecer contenido original</button>
+</div></div></section>
+
+</main></div></div>
+<div class="toast" id="toast"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="seaire-config.js"></script>
-<script src="seaire-cloud.js"></script>
+<script src="seaire-projects.js"></script>
 <script>
-let client=null,currentImages=[],currentVideo=null,services=[];const $=id=>document.getElementById(id);
-function safe(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function showMessage(text,ok=false){$('msg').textContent=text;$('msg').className='msg '+(ok?'ok':'')}
-function showSection(id){$('projectsSection').classList.toggle('hidden',id!=='projectsSection');$('servicesSection').classList.toggle('hidden',id!=='servicesSection');$('tabProjects').classList.toggle('active',id==='projectsSection');$('tabServices').classList.toggle('active',id==='servicesSection');if(id==='servicesSection')renderServices()}
-function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');render()}
-async function init(){
- if(!window.supabase||!window.SEAIRE_CONFIG||!window.SEAIRE_CONFIG.SUPABASE_URL){$('login').classList.remove('hidden');$('loginMsg').textContent='Error de configuración: Supabase no se cargó correctamente.';return}
- client=window.seaireSupabase||window.supabase.createClient(window.SEAIRE_CONFIG.SUPABASE_URL,window.SEAIRE_CONFIG.SUPABASE_ANON_KEY);window.seaireSupabase=client;
- const {data,error}=await client.auth.getSession();if(error){$('login').classList.remove('hidden');$('loginMsg').textContent='Error al comprobar la sesión: '+error.message;return}if(data.session)showApp();else $('login').classList.remove('hidden');
- client.auth.onAuthStateChange((_event,session)=>{if(session)showApp();else{$('app').classList.add('hidden');$('login').classList.remove('hidden')}})
+/* =========================================================
+   SEAIRE ADMIN INTEGRADO
+   - Mantiene la interfaz del admin actual.
+   - Integra autenticación, proyectos y servicios de admin-ok.
+   - No usa service_role; solo clave publishable/anon.
+   ========================================================= */
+
+const SUPABASE_URL = 'https://xybslfqvoupmkxhybeul.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zdFfxY43JQCdtV6ivlZCuA_aca9iI1f';
+
+let client = null;
+let cfg = null;
+let services = [];
+let currentImages = [];
+let currentVideo = null;
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+function toast(t){
+  const e=$('toast'); e.textContent=t; e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),2400);
 }
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginMsg').textContent='';$('loginBtn').disabled=true;$('loginBtn').textContent='Ingresando...';try{const {error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){$('loginMsg').textContent='No se pudo iniciar sesión: '+error.message;return}$('password').value=''}catch(err){$('loginMsg').textContent='Error de conexión con Supabase: '+err.message}finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Ingresar'}});
-$('logout').onclick=async()=>{if(client)await client.auth.signOut();location.reload()};
-async function loadServices(){const {data,error}=await client.from('services').select('*').order('sort_order',{ascending:true});if(error)throw error;services=data||[];populateServiceSelect();return services}
-function populateServiceSelect(){$('service').innerHTML=services.filter(s=>s.enabled!==false).map(s=>`<option value="${safe(s.name)}">${safe(s.name)}</option>`).join('')||'<option value="">Sin servicios registrados</option>'}
-async function render(){try{await loadServices();const {data,error}=await client.from('projects').select('*').order('created_at',{ascending:false});if(error){showMessage(error.message);return}$('list').innerHTML=(data||[]).map(p=>`<div class="item"><div class="thumb">${p.cover_url?`<img src="${safe(p.cover_url)}" alt="">`:'⚡'}</div><div><b>${safe(p.title)}</b><br><small>${safe(p.service)} · ${safe(p.location||'')} · ${p.year||''}</small><br><span class="status">${p.published?'PUBLICADO':'BORRADOR'}</span></div><div class="actions"><button class="secondary" onclick="editProject('${safe(p.id)}')">Editar</button><button class="danger" onclick="deleteProject('${safe(p.id)}')">Eliminar</button></div></div>`).join('')||'<div class="help">No hay proyectos todavía.</div>'}catch(err){showMessage('No se pudieron cargar los datos: '+err.message)}}
-function newProject(){showSection('projectsSection');$('editor').classList.remove('hidden');$('form').reset();$('pid').value='';$('year').value='2026';$('published').checked=true;currentImages=[];currentVideo=null;populateServiceSelect();renderPreview();$('videoPreview').textContent='';$('formTitle').textContent='Nuevo proyecto';$('editor').scrollIntoView({behavior:'smooth'})}
-async function editProject(id){const {data,error}=await client.from('projects').select('*').eq('id',id).single();if(error){showMessage(error.message);return}$('editor').classList.remove('hidden');$('pid').value=data.id;$('title').value=data.title||'';populateServiceSelect();$('service').value=data.service||'';$('location').value=data.location||'';$('year').value=data.year||'';$('description').value=data.description||'';$('published').checked=!!data.published;currentImages=Array.isArray(data.images)?data.images:[];currentVideo=data.video_url||null;renderPreview();$('videoPreview').textContent=currentVideo?'Video actual: '+currentVideo:'';$('formTitle').textContent='Editar proyecto';$('editor').scrollIntoView({behavior:'smooth'})}
-function cancel(){$('editor').classList.add('hidden')}function renderPreview(){$('preview').innerHTML=currentImages.map((url,i)=>`<div class="preview-item"><img src="${safe(url)}" alt=""><button class="remove" type="button" onclick="removeImage(${i})">×</button></div>`).join('')}function removeImage(i){currentImages.splice(i,1);renderPreview()}
-async function uploadFile(file,folder){const ext=(file.name.split('.').pop()||'bin').toLowerCase();const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;const {error}=await client.storage.from('project-media').upload(path,file,{upsert:false,contentType:file.type});if(error)throw error;const {data}=client.storage.from('project-media').getPublicUrl(path);return data.publicUrl}
-$('photoFiles').addEventListener('change',async e=>{const files=[...e.target.files];if(!files.length)return;$('saveBtn').disabled=true;try{for(const file of files){if(file.size>15*1024*1024)throw new Error('Cada fotografía debe pesar menos de 15 MB.');currentImages.push(await uploadFile(file,'photos'))}renderPreview()}catch(err){showMessage('Error subiendo fotografía: '+err.message)}finally{$('saveBtn').disabled=false}});
-$('videoFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;if(file.size>100*1024*1024){showMessage('El video debe pesar menos de 100 MB.');return}$('saveBtn').disabled=true;try{currentVideo=await uploadFile(file,'videos');$('videoPreview').textContent='Video listo para publicar.'}catch(err){showMessage('Error subiendo video: '+err.message)}finally{$('saveBtn').disabled=false}});
-$('form').addEventListener('submit',async e=>{e.preventDefault();$('saveBtn').disabled=true;showMessage('Guardando proyecto...');const obj={title:$('title').value.trim(),service:$('service').value,location:$('location').value.trim(),year:Number($('year').value)||null,description:$('description').value.trim(),cover_url:currentImages[0]||null,video_url:currentVideo,images:currentImages,published:$('published').checked};try{const id=$('pid').value;const result=id?await client.from('projects').update(obj).eq('id',id):await client.from('projects').insert(obj);if(result.error)showMessage('No se pudo guardar: '+result.error.message);else{showMessage('Proyecto guardado correctamente.',true);cancel();await render()}}catch(err){showMessage('Error: '+err.message)}finally{$('saveBtn').disabled=false}});
-async function deleteProject(id){if(!confirm('¿Eliminar este proyecto de la página pública?'))return;const {error}=await client.from('projects').delete().eq('id',id);if(error)showMessage(error.message);else await render()}
-async function renderServices(){try{await loadServices();$('serviceList').innerHTML=services.map(s=>`<div class="service-item"><div class="service-icon">${safe(s.icon||'⚡')}</div><div><b>${safe(s.name)}</b><br><small>${safe(s.description||'')}</small><br><span class="status">${s.enabled===false?'INACTIVO':'ACTIVO'}</span></div><div class="service-actions"><button class="secondary" onclick="editService('${safe(s.id)}')" type="button">Editar</button><button class="secondary" onclick="toggleService('${safe(s.id)}',${s.enabled!==false})" type="button">${s.enabled===false?'Activar':'Desactivar'}</button><button class="danger" onclick="deleteService('${safe(s.id)}')" type="button">Eliminar</button></div></div>`).join('')||'<div class="help">No hay servicios registrados.</div>'}catch(err){$('serviceList').innerHTML='<div class="msg">No se pudieron cargar los servicios: '+safe(err.message)+'</div>'}}
-function newService(){$('serviceEditor').classList.remove('hidden');$('serviceForm').reset();$('sid').value='';$('sicon').value='⚡';$('senabled').checked=true;$('serviceFormTitle').textContent='Nuevo servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
-function editService(id){const s=services.find(x=>String(x.id)===String(id));if(!s)return;$('serviceEditor').classList.remove('hidden');$('sid').value=s.id;$('sname').value=s.name||'';$('sicon').value=s.icon||'⚡';$('sdescription').value=s.description||'';$('senabled').checked=s.enabled!==false;$('serviceFormTitle').textContent='Editar servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
+
+function showLoginMessage(t,ok=false){
+  $('loginMsg').textContent=t;
+  $('loginMsg').className='login-msg '+(ok?'ok':'');
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  const sec=$(id); if(sec) sec.classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.tab===id));
+  const active=document.querySelector('.nav a.active');
+  $('pageTitle').textContent=active?active.textContent.replace(/^[^A-Za-zÁÉÍÓÚÑ]+/,'').trim():id;
+  if(location.hash.slice(1)!==id) history.replaceState(null,'','#'+id);
+  if(id==='servicios') renderServices();
+  if(id==='proyectos') renderProjects();
+}
+
+document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{
+  e.preventDefault(); showSection(a.dataset.tab);
+});
+
+function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)}
+function set(obj,path,val){
+  const a=path.split('.'); let o=obj;
+  for(let i=0;i<a.length-1;i++) o=o[a[i]];
+  o[a[a.length-1]]=val;
+}
+
+function bindFields(){
+  document.querySelectorAll('[data-bind]').forEach(e=>{
+    const p=e.dataset.bind;
+    e.value=get(cfg,p)??'';
+    e.oninput=()=>set(cfg,p,e.value);
+  });
+}
+
+function renderNav(){
+  const labels={inicio:'Inicio',servicios:'Servicios',proyectos:'Proyectos',nosotros:'Nosotros',cotizacion:'Cotización',contacto:'Contacto',cta:'Botón'};
+  $('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k])}"></div>`).join('');
+  $('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value);
+}
+
+function renderLogo(){
+  const p=$('logoPreview');
+  p.innerHTML=cfg?.brand?.logo?`<img src="${esc(cfg.brand.logo)}" alt="Logo">`:'';
+}
+
+function saveAll(){
+  try{
+    if(window.SEAIRE_CONFIG) window.SEAIRE_CONFIG.write(cfg);
+    toast('Cambios de contenido guardados.');
+  }catch(e){toast('No se pudo guardar: '+e.message)}
+}
+
+function renderStats(projectRows=null){
+  $('sCount').textContent=services.filter(s=>s.enabled!==false).length;
+  if(projectRows){
+    $('pCount').textContent=projectRows.length;
+    $('photoCount').textContent=projectRows.reduce((n,p)=>n+(Array.isArray(p.images)?p.images.length:0),0);
+    $('videoCount').textContent=projectRows.filter(p=>p.video_url).length;
+  }
+}
+
+/* ---------------- AUTENTICACIÓN SUPABASE ---------------- */
+
+async function startAuth(){
+  if(!window.supabase){
+    showLoginMessage('No se pudo cargar la librería de Supabase. Verifica tu conexión a Internet.');
+    $('loginScreen').classList.remove('hidden');
+    $('authLoading').classList.add('hidden');
+    return;
+  }
+
+  client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  window.seaireSupabase=client;
+
+  try{
+    const {data,error}=await client.auth.getSession();
+    if(error) throw error;
+    if(data.session) await enterAdmin();
+    else{
+      $('authLoading').classList.add('hidden');
+      $('loginScreen').classList.remove('hidden');
+    }
+  }catch(err){
+    $('authLoading').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    showLoginMessage('No se pudo comprobar la sesión: '+err.message);
+  }
+
+  client.auth.onAuthStateChange(async (_event,session)=>{
+    if(session) await enterAdmin();
+    else{
+      $('adminApp').classList.add('hidden');
+      $('loginScreen').classList.remove('hidden');
+      $('authLoading').classList.add('hidden');
+    }
+  });
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!client){showLoginMessage('Supabase todavía no está listo.');return}
+  $('loginBtn').disabled=true;
+  $('loginBtn').textContent='Ingresando...';
+  showLoginMessage('');
+  try{
+    const {error}=await client.auth.signInWithPassword({
+      email:$('email').value.trim(),
+      password:$('password').value
+    });
+    if(error) showLoginMessage('No se pudo iniciar sesión: '+error.message);
+    else $('password').value='';
+  }catch(err){
+    showLoginMessage('Error de conexión con Supabase: '+err.message);
+  }finally{
+    $('loginBtn').disabled=false;
+    $('loginBtn').textContent='Ingresar';
+  }
+});
+
+$('logout').onclick=async()=>{
+  try{ if(client) await client.auth.signOut(); }
+  finally{
+    $('adminApp').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    $('password').value='';
+  }
+};
+
+/* ---------------- SERVICIOS SUPABASE ---------------- */
+
+async function loadServices(){
+  const {data,error}=await client.from('services').select('*').order('sort_order',{ascending:true});
+  if(error) throw error;
+  services=data||[];
+  return services;
+}
+
+function serviceOptions(){
+  return services.filter(s=>s.enabled!==false)
+    .map(s=>`<option value="${esc(s.name)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')
+    || '<option value="">Sin servicios activos</option>';
+}
+
+async function renderServices(){
+  try{
+    await loadServices();
+    $('serviceList').innerHTML=services.map(s=>`
+      <div class="service-row">
+        <div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div>
+        <div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small></div>
+        <div><span style="color:${s.enabled===false?'#ff9eae':'#7ff0c2'}">${s.enabled===false?'INACTIVO':'ACTIVO'}</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button>
+          <button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.enabled!==false})">${s.enabled===false?'Activar':'Desactivar'}</button>
+          <button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button>
+        </div>
+      </div>`).join('') || '<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';
+    renderStats();
+  }catch(err){
+    $('serviceList').innerHTML='<div style="padding:20px;color:#ffb3b3">No se pudieron cargar los servicios: '+esc(err.message)+'</div>';
+  }
+}
+
+function newService(){
+  $('serviceEditor').classList.remove('hidden');
+  $('serviceForm').reset();
+  $('sid').value='';
+  $('sicon').value='⚡';
+  $('senabled').checked=true;
+  $('serviceFormTitle').textContent='Nuevo servicio';
+  $('serviceEditor').scrollIntoView({behavior:'smooth'});
+}
+
+function editService(id){
+  const s=services.find(x=>String(x.id)===String(id));
+  if(!s)return;
+  $('serviceEditor').classList.remove('hidden');
+  $('sid').value=s.id;
+  $('sname').value=s.name||'';
+  $('sicon').value=s.icon||'⚡';
+  $('sdescription').value=s.description||'';
+  $('senabled').checked=s.enabled!==false;
+  $('serviceFormTitle').textContent='Editar servicio';
+  $('serviceEditor').scrollIntoView({behavior:'smooth'});
+}
+
 function cancelService(){$('serviceEditor').classList.add('hidden')}
-$('serviceForm').addEventListener('submit',async e=>{e.preventDefault();$('saveServiceBtn').disabled=true;try{const obj={name:$('sname').value.trim(),icon:$('sicon').value.trim()||'⚡',description:$('sdescription').value.trim(),enabled:$('senabled').checked};const id=$('sid').value;let result;if(id)result=await client.from('services').update(obj).eq('id',id);else{const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),0);obj.sort_order=max+1;result=await client.from('services').insert(obj)}if(result.error)throw result.error;cancelService();showMessage('Servicio guardado correctamente.',true);await renderServices()}catch(err){showMessage('No se pudo guardar el servicio: '+err.message)}finally{$('saveServiceBtn').disabled=false}});
-async function toggleService(id,current){const {error}=await client.from('services').update({enabled:!current}).eq('id',id);if(error)showMessage(error.message);else{showMessage('Estado del servicio actualizado.',true);await renderServices()}}
-async function deleteService(id){if(!confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.'))return;const {error}=await client.from('services').delete().eq('id',id);if(error)showMessage('No se pudo eliminar: '+error.message);else{showMessage('Servicio eliminado.',true);await renderServices()}}
-init();
+
+$('serviceForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  $('saveServiceBtn').disabled=true;
+  try{
+    const obj={
+      name:$('sname').value.trim(),
+      icon:$('sicon').value.trim()||'⚡',
+      description:$('sdescription').value.trim(),
+      enabled:$('senabled').checked
+    };
+    const id=$('sid').value;
+    let result;
+    if(id){
+      result=await client.from('services').update(obj).eq('id',id);
+    }else{
+      const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),0);
+      obj.sort_order=max+1;
+      result=await client.from('services').insert(obj);
+    }
+    if(result.error)throw result.error;
+    cancelService();
+    toast('Servicio guardado correctamente.');
+    await renderServices();
+  }catch(err){
+    toast('No se pudo guardar el servicio: '+err.message);
+  }finally{$('saveServiceBtn').disabled=false}
+});
+
+async function toggleService(id,current){
+  const {error}=await client.from('services').update({enabled:!current}).eq('id',id);
+  if(error)toast(error.message);
+  else{toast('Estado del servicio actualizado.');await renderServices()}
+}
+
+async function deleteService(id){
+  if(!confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.'))return;
+  const {error}=await client.from('services').delete().eq('id',id);
+  if(error)toast('No se pudo eliminar: '+error.message);
+  else{toast('Servicio eliminado.');await renderServices()}
+}
+
+/* ---------------- PROYECTOS SUPABASE ---------------- */
+
+async function renderProjects(){
+  try{
+    const {data,error}=await client.from('projects').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    const rows=data||[];
+    $('projectRows').innerHTML=rows.length?rows.map(p=>`
+      <tr>
+        <td><strong>${esc(p.title||'')}</strong><br><small>${p.year||''}</small></td>
+        <td>${esc(p.service||'')}</td>
+        <td>${esc(p.location||'')}</td>
+        <td>${Array.isArray(p.images)?p.images.length:0} foto(s)${p.video_url?' · video':''}</td>
+        <td>${p.published?'PUBLICADO':'BORRADOR'}</td>
+        <td>
+          <button class="mini" onclick="editProject('${esc(p.id)}')">Editar</button>
+          <button class="mini danger" onclick="deleteProject('${esc(p.id)}')">Eliminar</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="6" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>';
+    renderStats(rows);
+  }catch(err){
+    $('projectRows').innerHTML='<tr><td colspan="6" style="padding:25px;color:#ffb3b3">No se pudieron cargar los proyectos: '+esc(err.message)+'</td></tr>';
+  }
+}
+
+async function newProject(){
+  await loadServices();
+  currentImages=[];currentVideo=null;
+  $('projectEditor').style.display='block';
+  $('projectForm').reset();
+  $('projectId').value='';
+  $('pyear').value='2026';
+  $('ppublished').checked=true;
+  $('pservice').innerHTML=serviceOptions();
+  $('ppreview').innerHTML='';
+  $('videoStatus').textContent='';
+  $('projectFormTitle').textContent='Nuevo proyecto';
+  $('projectEditor').scrollIntoView({behavior:'smooth'});
+}
+
+async function editProject(id){
+  const {data,error}=await client.from('projects').select('*').eq('id',id).single();
+  if(error){toast(error.message);return}
+  await loadServices();
+  $('projectEditor').style.display='block';
+  $('projectId').value=data.id;
+  $('ptitle').value=data.title||'';
+  $('pservice').innerHTML=serviceOptions();
+  $('pservice').value=data.service||'';
+  $('plocation').value=data.location||'';
+  $('pyear').value=data.year||'';
+  $('pdescription').value=data.description||'';
+  $('ppublished').checked=!!data.published;
+  currentImages=Array.isArray(data.images)?data.images:[];
+  currentVideo=data.video_url||null;
+  renderPhotoPreview();
+  $('videoStatus').textContent=currentVideo?'Video actual: '+currentVideo:'';
+  $('projectFormTitle').textContent='Editar proyecto';
+  $('projectEditor').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelProject(){$('projectEditor').style.display='none'}
+
+function renderPhotoPreview(){
+  $('ppreview').innerHTML=currentImages.map((url,i)=>`
+    <div style="position:relative">
+      <img src="${esc(url)}" alt="">
+      <button type="button" onclick="removeImage(${i})" style="position:absolute;right:2px;top:2px;border:0;border-radius:50%;background:#b5233b;color:#fff;width:22px;height:22px;cursor:pointer">×</button>
+    </div>`).join('');
+}
+
+function removeImage(i){currentImages.splice(i,1);renderPhotoPreview()}
+
+async function uploadFile(file,folder){
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
+  const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const {error}=await client.storage.from('project-media').upload(path,file,{upsert:false,contentType:file.type});
+  if(error)throw error;
+  const {data}=client.storage.from('project-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+$('pphotos').addEventListener('change',async e=>{
+  const files=[...e.target.files];if(!files.length)return;
+  $('projectSaveBtn').disabled=true;
+  try{
+    for(const file of files){
+      if(file.size>15*1024*1024)throw new Error('Cada fotografía debe pesar menos de 15 MB.');
+      currentImages.push(await uploadFile(file,'photos'));
+    }
+    renderPhotoPreview();
+  }catch(err){toast('Error subiendo fotografía: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
+});
+
+$('pvideo').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>100*1024*1024){toast('El video debe pesar menos de 100 MB.');return}
+  $('projectSaveBtn').disabled=true;
+  try{
+    currentVideo=await uploadFile(file,'videos');
+    $('videoStatus').textContent='Video listo para publicar.';
+  }catch(err){toast('Error subiendo video: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
+});
+
+$('projectForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  $('projectSaveBtn').disabled=true;
+  try{
+    const obj={
+      title:$('ptitle').value.trim(),
+      service:$('pservice').value,
+      location:$('plocation').value.trim(),
+      year:Number($('pyear').value)||null,
+      description:$('pdescription').value.trim(),
+      cover_url:currentImages[0]||null,
+      video_url:currentVideo,
+      images:currentImages,
+      published:$('ppublished').checked
+    };
+    const id=$('projectId').value;
+    const result=id
+      ?await client.from('projects').update(obj).eq('id',id)
+      :await client.from('projects').insert(obj);
+    if(result.error)throw result.error;
+    cancelProject();
+    toast('Proyecto guardado correctamente.');
+    await renderProjects();
+  }catch(err){toast('No se pudo guardar el proyecto: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
+});
+
+async function deleteProject(id){
+  if(!confirm('¿Eliminar este proyecto de la página pública?'))return;
+  const {error}=await client.from('projects').delete().eq('id',id);
+  if(error)toast(error.message);
+  else{toast('Proyecto eliminado.');await renderProjects()}
+}
+
+/* ---------------- CONTENIDO LOCAL ACTUAL ---------------- */
+
+function initLocalConfig(){
+  if(window.SEAIRE_CONFIG){
+    cfg=window.SEAIRE_CONFIG.read();
+  }else{
+    cfg={nav:{},brand:{},hero:{},about:{},servicesHead:{},projectsHead:{},quote:{},contact:{},footer:{},seo:{}};
+  }
+  bindFields();renderNav();renderLogo();
+}
+
+$('logoFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const arr=await readImages([f]);
+    cfg.brand.logo=arr[0];renderLogo();toast('Logo cargado. Pulsa Guardar cambios.');
+  }catch(err){toast('No se pudo cargar el logo.')}
+});
+
+function readImages(files){
+  return Promise.all([...files].map(f=>new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=1280;let w=img.width,h=img.height;
+        if(w>max){h*=max/w;w=max}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',.76));
+      };
+      img.onerror=rej;img.src=r.result;
+    };
+    r.onerror=rej;r.readAsDataURL(f);
+  })));
+}
+
+function exportConfig(){
+  const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+$('importFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    cfg=JSON.parse(await f.text());
+    if(window.SEAIRE_CONFIG) cfg=Object.assign(window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT),cfg);
+    bindFields();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.');
+  }catch(err){toast('Archivo de configuración no válido.')}
+});
+
+function resetConfig(){
+  if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;
+  if(window.SEAIRE_CONFIG) cfg=window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT);
+  bindFields();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.');
+}
+
+async function enterAdmin(){
+  $('loginScreen').classList.add('hidden');
+  $('authLoading').classList.add('hidden');
+  $('adminApp').classList.remove('hidden');
+  try{
+    initLocalConfig();
+    await loadServices();
+    await renderProjects();
+    if(location.hash && $(location.hash.slice(1))) showSection(location.hash.slice(1));
+    else showSection('dashboard');
+  }catch(err){
+    toast('Sesión iniciada, pero hubo un problema cargando datos: '+err.message);
+  }
+}
+
+startAuth();
 </script>
-</body></html>
+</body>
+</html>
