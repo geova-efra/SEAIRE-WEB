@@ -103,7 +103,7 @@ button,input,select,textarea{font:inherit}
   </div>
 </div>
 
-<div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos y servicios se guardan en Supabase.</div>
+<div class="notice"><strong>Panel de contenido SEAIRE:</strong> desde aquí puedes modificar el contenido principal de la página: empresa, portada, quiénes somos, misión, visión, servicios, proyectos, cotización, contacto y SEO. Los proyectos y servicios se guardan en Supabase. En cada servicio puedes configurar una carpeta de Google Drive para que el visitante consulte el expediente público del trabajo.</div>
 
 <section id="dashboard" class="section active">
 <div class="stats">
@@ -161,6 +161,7 @@ button,input,select,textarea{font:inherit}
       <div class="field"><label>Nombre *</label><input id="sname" required></div>
       <div class="field"><label>Ícono</label><input id="sicon" value="⚡" maxlength="8"></div>
       <div class="field full"><label>Descripción *</label><textarea id="sdescription" required></textarea></div>
+      <div class="field full"><label>Carpeta de Google Drive</label><input id="sdrive" type="url" placeholder="https://drive.google.com/drive/folders/..." autocomplete="off"><small>La carpeta debe estar compartida como <strong>“Cualquier persona con el enlace → Lector”</strong>. El cliente podrá ver y descargar, pero no editar ni eliminar.</small></div>
       <label class="toggle"><input id="senabled" class="check" type="checkbox" checked> Servicio activo en la página pública</label>
       <div class="actions field full"><button class="btn secondary" type="button" onclick="cancelService()">Cancelar</button><button class="btn" type="submit" id="saveServiceBtn">Guardar servicio</button></div>
     </form>
@@ -249,9 +250,7 @@ let client = null;
 let cfg = null;
 let services = [];
 let currentImages = [];
-let currentImagePaths = [];
 let currentVideo = null;
-let currentVideoPath = null;
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -307,31 +306,15 @@ function renderLogo(){
   p.innerHTML=cfg?.brand?.logo?`<img src="${esc(cfg.brand.logo)}" alt="Logo">`:'';
 }
 
-async function saveAll(){
+function saveAll(){
   try{
-    if(!client) throw new Error('Supabase no está conectado.');
     if(window.SEAIRE_CONFIG) window.SEAIRE_CONFIG.write(cfg);
-    const sections={
-      empresa:{nombre:cfg.brand.name,razon_social:cfg.brand.legal,eslogan:cfg.brand.tagline,logo:cfg.brand.logo},
-      inicio:{badge:cfg.hero.badge,titulo:cfg.hero.title,highlight:cfg.hero.highlight,descripcion:cfg.hero.description,boton_principal:cfg.hero.primary,boton_secundario:cfg.hero.secondary},
-      nosotros:{eyebrow:cfg.about.eyebrow,titulo:cfg.about.title,quienes_titulo:cfg.about.whoTitle,quienes_somos:cfg.about.who,mision:cfg.about.mission,vision:cfg.about.vision},
-      servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description},
-      proyectos:{eyebrow:cfg.projectsHead.eyebrow,titulo:cfg.projectsHead.title,descripcion:cfg.projectsHead.description},
-      cotizacion:{eyebrow:cfg.quote.eyebrow,titulo:cfg.quote.title,descripcion:cfg.quote.description,boton:cfg.quote.button},
-      contacto:{eyebrow:cfg.contact.eyebrow,titulo:cfg.contact.title,descripcion:cfg.contact.description,whatsapp:cfg.contact.whatsapp,phoneLink:cfg.contact.phoneLink,correo:cfg.contact.email},
-      seo:{...cfg.seo},
-      navegacion:{...cfg.nav,footerCopyright:cfg.footer.copyright}
-    };
-    for(const [section,data] of Object.entries(sections)){
-      const {error}=await client.from('site_settings').upsert({section,data,updated_at:new Date().toISOString()},{onConflict:'section'});
-      if(error) throw error;
-    }
-    toast('Cambios guardados en Supabase y disponibles para la página pública.');
+    toast('Cambios de contenido guardados.');
   }catch(e){toast('No se pudo guardar: '+e.message)}
 }
 
 function renderStats(projectRows=null){
-  $('sCount').textContent=services.filter(s=>s.active!==false && s.enabled!==false).length;
+  $('sCount').textContent=services.filter(s=>s.active!==false).length;
   if(projectRows){
     $('pCount').textContent=projectRows.length;
     $('photoCount').textContent=projectRows.reduce((n,p)=>n+(Array.isArray(p.images)?p.images.length:0),0);
@@ -417,7 +400,7 @@ async function loadServices(){
 
 function serviceOptions(){
   return services.filter(s=>s.active!==false)
-    .map(s=>`<option value="${esc(s.title||s.title||s.name||'')}">${esc(s.icon||'⚡')} ${esc(s.title||s.title||s.name||'')}</option>`).join('')
+    .map(s=>`<option value="${esc(s.name)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')
     || '<option value="">Sin servicios activos</option>';
 }
 
@@ -427,7 +410,7 @@ async function renderServices(){
     $('serviceList').innerHTML=services.map(s=>`
       <div class="service-row">
         <div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div>
-        <div><strong>${esc(s.title||s.title||s.name||'')}</strong><br><small>${esc(s.description||'')}</small></div>
+        <div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small><br><small style="color:${s.drive_url?'#7ff0c2':'#8fa7bd'}">${s.drive_url?'📁 Carpeta Drive configurada':'📁 Sin carpeta Drive'}</small></div>
         <div><span style="color:${s.active===false?'#ff9eae':'#7ff0c2'}">${s.active===false?'INACTIVO':'ACTIVO'}</span></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button>
@@ -446,6 +429,7 @@ function newService(){
   $('serviceForm').reset();
   $('sid').value='';
   $('sicon').value='⚡';
+  $('sdrive').value='';
   $('senabled').checked=true;
   $('serviceFormTitle').textContent='Nuevo servicio';
   $('serviceEditor').scrollIntoView({behavior:'smooth'});
@@ -456,9 +440,10 @@ function editService(id){
   if(!s)return;
   $('serviceEditor').classList.remove('hidden');
   $('sid').value=s.id;
-  $('sname').value=s.title||s.name||'';
+  $('sname').value=s.name||'';
   $('sicon').value=s.icon||'⚡';
   $('sdescription').value=s.description||'';
+  $('sdrive').value=s.drive_url||'';
   $('senabled').checked=s.active!==false;
   $('serviceFormTitle').textContent='Editar servicio';
   $('serviceEditor').scrollIntoView({behavior:'smooth'});
@@ -471,9 +456,10 @@ $('serviceForm').addEventListener('submit',async e=>{
   $('saveServiceBtn').disabled=true;
   try{
     const obj={
-      title:$('sname').value.trim(),
+      name:$('sname').value.trim(),
       icon:$('sicon').value.trim()||'⚡',
       description:$('sdescription').value.trim(),
+      drive_url:$('sdrive').value.trim()||null,
       active:$('senabled').checked
     };
     const id=$('sid').value;
@@ -534,7 +520,7 @@ async function renderProjects(){
 
 async function newProject(){
   await loadServices();
-  currentImages=[];currentImagePaths=[];currentVideo=null;currentVideoPath=null;
+  currentImages=[];currentVideo=null;
   $('projectEditor').style.display='block';
   $('projectForm').reset();
   $('projectId').value='';
@@ -548,29 +534,26 @@ async function newProject(){
 }
 
 async function editProject(id){
-  const {data,error}=await client.from('projects').select('*,project_media(*)').eq('id',id).single();
+  const {data,error}=await client.from('projects').select('*').eq('id',id).single();
   if(error){toast(error.message);return}
   await loadServices();
   $('projectEditor').style.display='block';
   $('projectId').value=data.id;
   $('ptitle').value=data.title||'';
   $('pservice').innerHTML=serviceOptions();
-  $('pservice').value=data.service_id||data.service||'';
+  $('pservice').value=data.service||'';
   $('plocation').value=data.location||'';
-  $('pyear').value=data.project_date ? String(data.project_date).slice(0,4) : (data.year||'');
+  $('pyear').value=data.year||'';
   $('pdescription').value=data.description||'';
-  $('ppublished').checked=data.published!==false;
-  const media=Array.isArray(data.project_media)?data.project_media:[];
-  currentImages=media.filter(m=>m.media_type==='image').sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(m=>m.public_url).filter(Boolean);
-  currentImagePaths=media.filter(m=>m.media_type==='image').sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(m=>m.storage_path).filter(Boolean);
-  const video=media.find(m=>m.media_type==='video');
-  currentVideo=video?.public_url||data.video_url||null;
-  currentVideoPath=video?.storage_path||null;
+  $('ppublished').checked=!!data.published;
+  currentImages=Array.isArray(data.images)?data.images:[];
+  currentVideo=data.video_url||null;
   renderPhotoPreview();
   $('videoStatus').textContent=currentVideo?'Video actual: '+currentVideo:'';
   $('projectFormTitle').textContent='Editar proyecto';
   $('projectEditor').scrollIntoView({behavior:'smooth'});
 }
+
 function cancelProject(){$('projectEditor').style.display='none'}
 
 function renderPhotoPreview(){
@@ -586,19 +569,19 @@ function removeImage(i){currentImages.splice(i,1);renderPhotoPreview()}
 async function uploadFile(file,folder){
   const ext=(file.name.split('.').pop()||'bin').toLowerCase();
   const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-  const bucket=folder==='videos'?'seaire-videos':'seaire-images';
-  const {error}=await client.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});
+  const {error}=await client.storage.from('project-media').upload(path,file,{upsert:false,contentType:file.type});
   if(error)throw error;
-  const {data}=client.storage.from(bucket).getPublicUrl(path);
-  return {url:data.publicUrl,path,bucket};
+  const {data}=client.storage.from('project-media').getPublicUrl(path);
+  return data.publicUrl;
 }
+
 $('pphotos').addEventListener('change',async e=>{
   const files=[...e.target.files];if(!files.length)return;
   $('projectSaveBtn').disabled=true;
   try{
     for(const file of files){
       if(file.size>15*1024*1024)throw new Error('Cada fotografía debe pesar menos de 15 MB.');
-      const up=await uploadFile(file,'photos'); currentImages.push(up.url); currentImagePaths.push(up.path);
+      currentImages.push(await uploadFile(file,'photos'));
     }
     renderPhotoPreview();
   }catch(err){toast('Error subiendo fotografía: '+err.message)}
@@ -610,8 +593,7 @@ $('pvideo').addEventListener('change',async e=>{
   if(file.size>100*1024*1024){toast('El video debe pesar menos de 100 MB.');return}
   $('projectSaveBtn').disabled=true;
   try{
-    const up=await uploadFile(file,'videos');
-    currentVideo=up.url; currentVideoPath=up.path;
+    currentVideo=await uploadFile(file,'videos');
     $('videoStatus').textContent='Video listo para publicar.';
   }catch(err){toast('Error subiendo video: '+err.message)}
   finally{$('projectSaveBtn').disabled=false}
@@ -623,35 +605,22 @@ $('projectForm').addEventListener('submit',async e=>{
   try{
     const obj={
       title:$('ptitle').value.trim(),
-      service_id:$('pservice').value||null,
+      service:$('pservice').value,
       location:$('plocation').value.trim(),
-      project_date:$('pyear').value ? `${$('pyear').value}-01-01` : null,
+      year:Number($('pyear').value)||null,
       description:$('pdescription').value.trim(),
-      video_url:currentVideo||null,
-      published:$('ppublished').checked,
-      updated_at:new Date().toISOString()
+      cover_url:currentImages[0]||null,
+      video_url:currentVideo,
+      images:currentImages,
+      published:$('ppublished').checked
     };
     const id=$('projectId').value;
-    let projectId=id;
-    if(id){
-      const {error}=await client.from('projects').update(obj).eq('id',id);
-      if(error)throw error;
-    }else{
-      const {data,error}=await client.from('projects').insert(obj).select('id').single();
-      if(error)throw error; projectId=data.id;
-    }
-    await client.from('project_media').delete().eq('project_id',projectId);
-    for(let i=0;i<currentImages.length;i++){
-      const path=currentImagePaths[i]||null;
-      const {error}=await client.from('project_media').insert({project_id:projectId,media_type:'image',storage_path:path,public_url:currentImages[i],sort_order:i});
-      if(error)throw error;
-    }
-    if(currentVideo){
-      const {error}=await client.from('project_media').insert({project_id:projectId,media_type:'video',storage_path:currentVideoPath,public_url:currentVideo,sort_order:0});
-      if(error)throw error;
-    }
+    const result=id
+      ?await client.from('projects').update(obj).eq('id',id)
+      :await client.from('projects').insert(obj);
+    if(result.error)throw result.error;
     cancelProject();
-    toast('Proyecto guardado correctamente y publicado en la web.');
+    toast('Proyecto guardado correctamente.');
     await renderProjects();
   }catch(err){toast('No se pudo guardar el proyecto: '+err.message)}
   finally{$('projectSaveBtn').disabled=false}
@@ -666,26 +635,12 @@ async function deleteProject(id){
 
 /* ---------------- CONTENIDO LOCAL ACTUAL ---------------- */
 
-async function initLocalConfig(){
-  cfg=window.SEAIRE_CONFIG?window.SEAIRE_CONFIG.read():{nav:{},brand:{},hero:{},about:{},servicesHead:{},projectsHead:{},quote:{},contact:{},footer:{},seo:{}};
-  try{
-    const sections=['empresa','inicio','nosotros','servicios','proyectos','cotizacion','contacto','seo','navegacion'];
-    const rows=await Promise.all(sections.map(section=>client.from('site_settings').select('data').eq('section',section).maybeSingle()));
-    const cloud={}; sections.forEach((section,i)=>{cloud[section]=rows[i].data?.data||{}});
-    if(cloud.empresa.nombre) cfg.brand.name=cloud.empresa.nombre;
-    if(cloud.empresa.razon_social) cfg.brand.legal=cloud.empresa.razon_social;
-    if(cloud.empresa.eslogan) cfg.brand.tagline=cloud.empresa.eslogan;
-    if(cloud.empresa.logo) cfg.brand.logo=cloud.empresa.logo;
-    Object.assign(cfg.hero,{badge:cloud.inicio.badge||cfg.hero.badge,title:cloud.inicio.titulo||cfg.hero.title,highlight:cloud.inicio.highlight||cfg.hero.highlight,description:cloud.inicio.descripcion||cfg.hero.description,primary:cloud.inicio.boton_principal||cfg.hero.primary,secondary:cloud.inicio.boton_secundario||cfg.hero.secondary});
-    Object.assign(cfg.about,{eyebrow:cloud.nosotros.eyebrow||cfg.about.eyebrow,title:cloud.nosotros.titulo||cfg.about.title,whoTitle:cloud.nosotros.quienes_titulo||cfg.about.whoTitle,who:cloud.nosotros.quienes_somos||cfg.about.who,mission:cloud.nosotros.mision||cfg.about.mission,vision:cloud.nosotros.vision||cfg.about.vision});
-    Object.assign(cfg.servicesHead,{eyebrow:cloud.servicios.eyebrow||cfg.servicesHead.eyebrow,title:cloud.servicios.titulo||cfg.servicesHead.title,description:cloud.servicios.descripcion||cfg.servicesHead.description});
-    Object.assign(cfg.projectsHead,{eyebrow:cloud.proyectos.eyebrow||cfg.projectsHead.eyebrow,title:cloud.proyectos.titulo||cfg.projectsHead.title,description:cloud.proyectos.descripcion||cfg.projectsHead.description});
-    Object.assign(cfg.quote,{eyebrow:cloud.cotizacion.eyebrow||cfg.quote.eyebrow,title:cloud.cotizacion.titulo||cfg.quote.title,description:cloud.cotizacion.descripcion||cfg.quote.description,button:cloud.cotizacion.boton||cfg.quote.button});
-    Object.assign(cfg.contact,{eyebrow:cloud.contacto.eyebrow||cfg.contact.eyebrow,title:cloud.contacto.titulo||cfg.contact.title,description:cloud.contacto.descripcion||cfg.contact.description,whatsapp:cloud.contacto.whatsapp||cfg.contact.whatsapp,phoneLink:cloud.contacto.phoneLink||cfg.contact.phoneLink,email:cloud.contacto.correo||cfg.contact.email});
-    Object.assign(cfg.seo,cloud.seo||{});
-    if(cloud.navegacion.footerCopyright) cfg.footer.copyright=cloud.navegacion.footerCopyright;
-    Object.assign(cfg.nav,cloud.navegacion||{});
-  }catch(e){ console.warn('No se pudo cargar contenido cloud:',e); }
+function initLocalConfig(){
+  if(window.SEAIRE_CONFIG){
+    cfg=window.SEAIRE_CONFIG.read();
+  }else{
+    cfg={nav:{},brand:{},hero:{},about:{},servicesHead:{},projectsHead:{},quote:{},contact:{},footer:{},seo:{}};
+  }
   bindFields();renderNav();renderLogo();
 }
 

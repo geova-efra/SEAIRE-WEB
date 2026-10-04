@@ -90,7 +90,7 @@ section{padding-top:42px!important;padding-bottom:42px!important}
 <body>
 <nav><div class="container nav">
   <a class="logo" href="#">SEA<span>IRE</span></a>
-  <div class="links"><a href="#inicio">Inicio</a><a href="#nosotros">Nosotros</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#contacto">Contacto</a></div>
+  <div class="links"><a href="#inicio">Inicio</a><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#nosotros">Nosotros</a><a href="#cotizacion">Cotización</a><a href="#contacto">Contacto</a></div>
   <a class="cta" href="#cotizacion">Contáctanos</a>
 </div></nav>
 
@@ -110,7 +110,23 @@ section{padding-top:42px!important;padding-bottom:42px!important}
 </div>
 </section>
 
+<section id="servicios"><div class="container">
+  <div class="section-head"><div class="eyebrow">Qué hacemos</div><h2>Ingeniería que conecta energía, control y tecnología.</h2><p class="lead">Un portafolio pensado para atender proyectos desde el diseño y la construcción hasta el mantenimiento y la puesta en servicio.</p></div>
+  <div class="cards service-cards">
+    <article class="card service-card" data-service="ingenieria"><div class="icon">⚡</div><h3>Ingeniería eléctrica</h3><p>Diseño de redes MT/BT, instalaciones eléctricas, estudios, memorias técnicas y soluciones para infraestructura.</p><span class="view-work">${s.drive_url?'Ver expediente →':'Ver trabajos →'}</span></article>
+    <article class="card service-card" data-service="automatizacion"><div class="icon">🏭</div><h3>Automatización industrial</h3><p>Tableros de control, variadores, motores, instrumentación y soluciones de automatización.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="mantenimiento"><div class="icon">🔧</div><h3>Mantenimiento</h3><p>Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio de equipos eléctricos.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="solar"><div class="icon">☀️</div><h3>Energía solar</h3><p>Diseño e implementación de sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="transformadores"><div class="icon">🔌</div><h3>Transformadores</h3><p>Instalación, mantenimiento, pruebas y soluciones asociadas a transformadores y sistemas de distribución.</p><span class="view-work">Ver trabajos →</span></article>
+    <article class="card service-card" data-service="asesoria"><div class="icon">📐</div><h3>Asesoría técnica</h3><p>Evaluación de proyectos, especificaciones, presupuestos, documentación técnica y acompañamiento profesional.</p><span class="view-work">Ver trabajos →</span></article>
+  </div>
+</div></section>
 
+<section class="projects" id="proyectos"><div class="container">
+  <div class="section-head"><div class="eyebrow">Proyectos</div><h2>Experiencia aplicada al campo.</h2><p class="lead">Esta sección queda preparada para incorporar fotografías, planos, fichas técnicas y resultados de cada proyecto ejecutado.</p></div>
+  <div class="project-grid" id="projectGrid"></div></div></div>
+  <div class="card"><h3>Trabajamos con enfoque integral</h3><p>Desde la identificación de la necesidad hasta la entrega de una solución operativa. La web también podrá crecer con un catálogo, sistema de clientes, seguimiento de proyectos y generación de cotizaciones.</p><br><a class="cta" href="#cotizacion">Quiero una solución</a></div>
+</div></section>
 
 
 <section id="nosotros" class="institutional">
@@ -150,36 +166,15 @@ section{padding-top:42px!important;padding-bottom:42px!important}
   </div>
 </section>
 
-
-  
-
-
-
-
-  
-<section id="servicios"><div class="container">
-  <div class="section-head"><div class="eyebrow">Qué hacemos</div><h2>Ingeniería que conecta energía, control y tecnología.</h2><p class="lead">Un portafolio pensado para atender proyectos desde el diseño y la construcción hasta el mantenimiento y la puesta en servicio.</p></div>
-  <div class="cards service-cards">
-    <article class="card service-card" data-service="ingenieria"><div class="icon">⚡</div><h3>Ingeniería eléctrica</h3><p>Diseño de redes MT/BT, instalaciones eléctricas, estudios, memorias técnicas y soluciones para infraestructura.</p><span class="view-work">Ver trabajos →</span></article>
-    <article class="card service-card" data-service="automatizacion"><div class="icon">🏭</div><h3>Automatización industrial</h3><p>Tableros de control, variadores, motores, instrumentación y soluciones de automatización.</p><span class="view-work">Ver trabajos →</span></article>
-    <article class="card service-card" data-service="mantenimiento"><div class="icon">🔧</div><h3>Mantenimiento</h3><p>Mantenimiento preventivo y correctivo, diagnóstico, pruebas y puesta en servicio de equipos eléctricos.</p><span class="view-work">Ver trabajos →</span></article>
-    <article class="card service-card" data-service="solar"><div class="icon">☀️</div><h3>Energía solar</h3><p>Diseño e implementación de sistemas fotovoltaicos, respaldo energético y soluciones solares modulares.</p><span class="view-work">Ver trabajos →</span></article>
-    <article class="card service-card" data-service="transformadores"><div class="icon">🔌</div><h3>Transformadores</h3><p>Instalación, mantenimiento, pruebas y soluciones asociadas a transformadores y sistemas de distribución.</p><span class="view-work">Ver trabajos →</span></article>
-    <article class="card service-card" data-service="asesoria"><div class="icon">📐</div><h3>Asesoría técnica</h3><p>Evaluación de proyectos, especificaciones, presupuestos, documentación técnica y acompañamiento profesional.</p><span class="view-work">Ver trabajos →</span></article>
-  </div>
+<section id="cotizacion"><div class="container">
+  <div class="quote"><div><div class="eyebrow">Cotizaciones</div><h2>Cuéntanos qué necesitas.</h2><p class="lead">Envíanos los datos básicos del proyecto y prepararemos el siguiente paso.</p></div>
+  <form class="form" id="quoteForm">
+    <input name="nombre" required placeholder="Nombre / Empresa"><input name="telefono" required type="tel" placeholder="Teléfono / WhatsApp"><input name="correo" required type="email" placeholder="Correo electrónico">
+    <select name="servicio"><option>Seleccione un servicio</option><option>Ingeniería eléctrica</option><option>Automatización industrial</option><option>Mantenimiento</option><option>Energía solar</option><option>Transformadores</option><option>Otro</option></select>
+    <textarea name="detalle" placeholder="Describa brevemente su proyecto"></textarea><button class="cta" type="submit">Enviar solicitud</button>
+  </form></div>
 </div></section>
 
-<section class="projects" id="proyectos"><div class="container">
-  <div class="section-head"><div class="eyebrow">Proyectos</div><h2>Experiencia aplicada al campo.</h2><p class="lead">Esta sección queda preparada para incorporar fotografías, planos, fichas técnicas y resultados de cada proyecto ejecutado.</p></div>
-  <div class="project-grid" id="projectGrid"></div></div></div>
-  <div class="card"><h3>Trabajamos con enfoque integral</h3><p>Desde la identificación de la necesidad hasta la entrega de una solución operativa. La web también podrá crecer con un catálogo, sistema de clientes, seguimiento de proyectos y generación de cotizaciones.</p><br><a class="cta" href="#cotizacion">Quiero una solución</a></div>
-</div></section>
-
-
-
-
-
-  
 <section id="contacto">
   <div class="container">
     <div class="section-head">
@@ -207,10 +202,6 @@ section{padding-top:42px!important;padding-bottom:42px!important}
   </div>
 </section>
 
-
-
-
-  
 <div class="gallery-modal" id="galleryModal" aria-hidden="true">
   <div class="gallery-backdrop" data-close-gallery></div>
   <div class="gallery-dialog" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
@@ -230,33 +221,11 @@ section{padding-top:42px!important;padding-bottom:42px!important}
 <a class="whatsapp" href="https://wa.me/593989020845?text=Hola%20SEAIRE%2C%20quiero%20solicitar%20una%20cotizaci%C3%B3n." target="_blank" aria-label="WhatsApp">✆</a>
 <script>
 const form=document.getElementById("quoteForm");
-form.addEventListener("submit",async function(e){
+form.addEventListener("submit",function(e){
   e.preventDefault();
-  const btn=form.querySelector('button[type="submit"]');
-  const original=btn.textContent;
-  btn.disabled=true; btn.textContent='Enviando solicitud…';
-  try{
-    const d=new FormData(form);
-    const payload={
-      nombre:String(d.get('nombre')||'').trim(),
-      telefono:String(d.get('telefono')||'').trim(),
-      correo:String(d.get('correo')||'').trim(),
-      servicio:String(d.get('servicio')||'').trim(),
-      detalle:String(d.get('detalle')||'').trim()
-    };
-    if(window.supabase && window.SEAIRE_CONFIG){
-      const sb=window.supabase.createClient(SEAIRE_CONFIG.SUPABASE_URL,SEAIRE_CONFIG.SUPABASE_ANON_KEY);
-      const {error}=await sb.functions.invoke('send-quote',{body:payload});
-      if(error) throw error;
-    }else{ throw new Error('No se pudo conectar con el servicio de correo.'); }
-    form.reset();
-    alert('Solicitud enviada correctamente. SEAIRE se pondrá en contacto contigo.');
-  }catch(err){
-    console.error('SEAIRE cotización:',err);
-    alert('No se pudo enviar la solicitud. Por favor inténtalo nuevamente o utiliza el botón de WhatsApp.');
-  }finally{
-    btn.disabled=false; btn.textContent=original;
-  }
+  const d=new FormData(form);
+  const msg=`Hola SEAIRE, quiero solicitar una cotización.%0A%0ANombre/Empresa: ${encodeURIComponent(d.get("nombre"))}%0ATeléfono: ${encodeURIComponent(d.get("telefono"))}%0ACorreo: ${encodeURIComponent(d.get("correo"))}%0AServicio: ${encodeURIComponent(d.get("servicio")||"No especificado")}%0ADetalle: ${encodeURIComponent(d.get("detalle")||"")}`;
+  window.open("https://wa.me/593989020845?text="+msg,"_blank");
 });
 </script>
 <div class="media-viewer" id="mediaViewer" aria-hidden="true">
@@ -315,7 +284,7 @@ function applySiteConfig(){
  }
  const serviceWrap=document.querySelector('.service-cards');
  if(serviceWrap){
-   serviceWrap.innerHTML=c.services.filter(s=>s.enabled).map(s=>`<article class="card service-card" data-service="${esc(s.id)}"><div class="icon">${esc(s.icon)}</div><h3>${esc(s.title||s.name||'')}</h3><p>${esc(s.description||'')}</p><span class="view-work">Ver trabajos →</span></article>`).join('');
+   serviceWrap.innerHTML=c.services.filter(s=>s.enabled).map(s=>`<article class="card service-card" data-service="${esc(s.id)}"><div class="icon">${esc(s.icon)}</div><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p><span class="view-work">Ver trabajos →</span></article>`).join('');
  }
  const ah=document.querySelector('#nosotros .section-head'); if(ah){
    ah.querySelector('.eyebrow').textContent=c.about.eyebrow; ah.querySelector('h2').textContent=c.about.title;
@@ -332,7 +301,6 @@ function applySiteConfig(){
  document.querySelectorAll('.service-card').forEach(card=>card.addEventListener('click',()=>{if(typeof openGallery==='function')openGallery(card.dataset.service)}));
 }
 applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
-})();
 </script>
 
 
@@ -383,7 +351,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
       const im=mediaFor(p)[0]?.public_url;
       return `<article class="project dynamic-project" data-id="${esc(p.id)}"
         style="${im?`background-image:url('${esc(im)}');background-size:cover;background-position:center`:''}">
-        <span class="tag">${esc(serviceById[p.service_id]?.title||serviceById[p.service_id]?.name||'SEAIRE')}</span>
+        <span class="tag">${esc(serviceById[p.service_id]?.name||'SEAIRE')}</span>
         <h3>${esc(p.title)}</h3>
         <p style="color:#c6d7e8;font-size:13px">${esc(p.location||'')} ${p.project_date?'· '+esc(p.project_date):''}</p>
       </article>`;
@@ -394,7 +362,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
   // Service cards use cloud projects. They retain the existing visual structure.
   const serviceCards=document.querySelector('.service-cards');
   if(serviceCards && services.length){
-    serviceCards.innerHTML=services.filter(s=>s.active!==false && s.enabled!==false).map(s=>`
+    serviceCards.innerHTML=services.filter(s=>s.active).map(s=>`
       <article class="card service-card" data-service="${esc(s.id)}">
         <div class="icon">${esc(s.icon)}</div>
         <h3>${esc(s.name)}</h3>
@@ -404,8 +372,17 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
 
     serviceCards.querySelectorAll('.service-card').forEach(card=>{
       card.addEventListener('click',()=>{
+        const service=serviceById[card.dataset.service];
+        const driveUrl=(service?.drive_url||'').trim();
+        if(driveUrl){
+          window.open(driveUrl,'_blank','noopener,noreferrer');
+          return;
+        }
+
+        // Compatibilidad: si todavía no se ha configurado Drive,
+        // conserva la galería actual hasta que el administrador agregue el enlace.
         const list=projects.filter(p=>p.service_id===card.dataset.service);
-        const title=serviceById[card.dataset.service]?.title||serviceById[card.dataset.service]?.name||'Trabajos';
+        const title=service?.name||'Trabajos';
         const modal=document.getElementById('galleryModal');
         const g=document.getElementById('galleryGrid');
         document.getElementById('galleryTitle').textContent=title;
@@ -424,34 +401,30 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
     });
   }
 
-  // Load all editable content from Supabase so the public page follows Admin.
+  // Load editable institutional/contact content from Supabase.
   try{
-    const [empresa,inicio,nosotros,servicios,proyectos,cotizacion,contacto,seo,navegacion]=await Promise.all([
-      SEAIRE_CLOUD.settings('empresa'),SEAIRE_CLOUD.settings('inicio'),SEAIRE_CLOUD.settings('nosotros'),
-      SEAIRE_CLOUD.settings('servicios'),SEAIRE_CLOUD.settings('proyectos'),SEAIRE_CLOUD.settings('cotizacion'),
-      SEAIRE_CLOUD.settings('contacto'),SEAIRE_CLOUD.settings('seo'),SEAIRE_CLOUD.settings('navegacion')
+    const [empresa,inicio,nosotros,contacto]=await Promise.all([
+      SEAIRE_CLOUD.settings('empresa'),SEAIRE_CLOUD.settings('inicio'),
+      SEAIRE_CLOUD.settings('nosotros'),SEAIRE_CLOUD.settings('contacto')
     ]);
-    document.title=seo.title||document.title;
-    const md=document.querySelector('meta[name="description"]');if(md&&seo.description)md.content=seo.description;
-    const navMap={inicio:'a[href="#inicio"]',servicios:'a[href="#servicios"]',proyectos:'a[href="#proyectos"]',nosotros:'a[href="#nosotros"]',cotizacion:'a[href="#cotizacion"]',contacto:'a[href="#contacto"]'};
-    Object.entries(navMap).forEach(([k,sel])=>{const el=document.querySelector('.links '+sel);if(el&&navegacion[k])el.textContent=navegacion[k]});
-    const navCta=document.querySelector('nav .cta');if(navCta&&navegacion.cta)navCta.textContent=navegacion.cta;
-    if(inicio.titulo){const h=document.querySelector('.hero h1');if(h){h.innerHTML=esc(inicio.titulo)+' <span></span>';h.querySelector('span').textContent=inicio.highlight||''}}
-    if(inicio.descripcion){const hp=document.querySelector('.hero p');if(hp)hp.textContent=inicio.descripcion}
-    if(inicio.badge){const b=document.querySelector('.hero .badge');if(b)b.textContent=inicio.badge}
-    if(inicio.boton_principal){const a=document.querySelector('.hero .actions a:first-child');if(a)a.textContent=inicio.boton_principal}
-    if(inicio.boton_secundario){const a=document.querySelector('.hero .actions a.secondary');if(a)a.textContent=inicio.boton_secundario}
-    const sh=document.querySelector('#servicios .section-head');if(sh){if(servicios.eyebrow)sh.querySelector('.eyebrow').textContent=servicios.eyebrow;if(servicios.titulo)sh.querySelector('h2').textContent=servicios.titulo;if(servicios.descripcion)sh.querySelector('.lead').textContent=servicios.descripcion}
-    const ph=document.querySelector('#proyectos .section-head');if(ph){if(proyectos.eyebrow)ph.querySelector('.eyebrow').textContent=proyectos.eyebrow;if(proyectos.titulo)ph.querySelector('h2').textContent=proyectos.titulo;if(proyectos.descripcion)ph.querySelector('.lead').textContent=proyectos.descripcion}
-    const q=document.querySelector('#cotizacion .quote');if(q){if(cotizacion.eyebrow)q.querySelector('.eyebrow').textContent=cotizacion.eyebrow;if(cotizacion.titulo)q.querySelector('h2').textContent=cotizacion.titulo;if(cotizacion.descripcion)q.querySelector('.lead').textContent=cotizacion.descripcion;if(cotizacion.boton)q.querySelector('button').textContent=cotizacion.boton}
-    const ah=document.querySelector('#nosotros .section-head');if(ah){if(nosotros.eyebrow)ah.querySelector('.eyebrow').textContent=nosotros.eyebrow;if(nosotros.titulo)ah.querySelector('h2').textContent=nosotros.titulo}
-    const cards=document.querySelectorAll('#nosotros .about-card');if(cards.length>=3){if(nosotros.quienes_titulo)cards[0].querySelector('h3').textContent=nosotros.quienes_titulo;if(nosotros.quienes_somos)cards[0].querySelector('p').textContent=nosotros.quienes_somos;if(nosotros.mision)cards[1].querySelector('p').textContent=nosotros.mision;if(nosotros.vision)cards[2].querySelector('p').textContent=nosotros.vision}
-    const ch=document.querySelector('#contacto .section-head');if(ch){if(contacto.eyebrow)ch.querySelector('.eyebrow').textContent=contacto.eyebrow;if(contacto.titulo)ch.querySelector('h2').textContent=contacto.titulo;if(contacto.descripcion)ch.querySelector('.lead').textContent=contacto.descripcion}
-    const phone=document.querySelector('#contacto .card:nth-child(1) a');if(phone&&contacto.whatsapp){phone.textContent=contacto.whatsapp;phone.href='https://wa.me/'+String(contacto.phoneLink||'').replace(/\D/g,'')}
-    const email=document.querySelector('#contacto .card:nth-child(2) a');if(email&&contacto.correo){email.textContent=contacto.correo;email.href='mailto:'+contacto.correo}
-    const foot=document.querySelector('footer');if(foot){const strong=foot.querySelector('strong');if(strong&&empresa.razon_social)strong.textContent=empresa.razon_social;if(navegacion.footerCopyright){const fs=foot.querySelectorAll('.footer>div');if(fs[1])fs[1].innerHTML='WhatsApp: '+esc(contacto.whatsapp||'')+' · '+esc(contacto.correo||'')+'<br>'+esc(navegacion.footerCopyright)}}
-  }catch(e){console.warn('No se pudo cargar contenido editable:',e);}
-
+    if(inicio.titulo){
+      const h=document.querySelector('.hero h1'); if(h) h.innerHTML=esc(inicio.titulo).replace(/\.$/,'')+' <span></span>';
+      const sp=document.querySelector('.hero h1 span'); if(sp) sp.textContent=inicio.highlight||'proyectos reales.';
+      const hp=document.querySelector('.hero p'); if(hp) hp.textContent=inicio.descripcion||hp.textContent;
+      const b=document.querySelector('.hero .badge'); if(b&&inicio.badge)b.textContent=inicio.badge;
+    }
+    const about=document.querySelector('#nosotros');
+    if(about && nosotros.quienes_somos){
+      const cards=about.querySelectorAll('.about-card');
+      if(cards[0]) cards[0].querySelector('p').textContent=nosotros.quienes_somos;
+      if(cards[1]) cards[1].querySelector('p').textContent=nosotros.mision||'';
+      if(cards[2]) cards[2].querySelector('p').textContent=nosotros.vision||'';
+    }
+    const tel=contacto.whatsapp||empresa.telefono;
+    const mail=contacto.correo||empresa.correo;
+    const phone=document.querySelector('#contacto .card:nth-child(1) a'); if(phone){phone.textContent=tel;phone.href='https://wa.me/593'+tel.replace(/\D/g,'').replace(/^593/,'');}
+    const email=document.querySelector('#contacto .card:nth-child(2) a'); if(email){email.textContent=mail;email.href='mailto:'+mail;}
+  }catch(e){console.warn("No se pudo cargar contenido editable:",e);}
 })();
 </script>
 
