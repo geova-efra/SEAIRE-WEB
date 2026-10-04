@@ -317,7 +317,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
     projects=await SEAIRE_CLOUD.projects();
   }catch(e){console.error("SEAIRE Supabase:",e); return;}
 
-  const serviceById=Object.fromEntries(services.map(s=>[s.id,s]));
+  const serviceById=Object.fromEntries(services.map(s=>[String(s.id),s]));
   const grid=document.getElementById('projectGrid');
 
   function mediaFor(p){
@@ -331,7 +331,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
     m.innerHTML=`<div class="gallery-backdrop"></div>
       <div class="gallery-dialog">
         <button class="gallery-close">×</button>
-        <div class="eyebrow">${esc(serviceById[p.service_id]?.name||'Proyecto')}</div>
+        <div class="eyebrow">${esc(serviceById[String(p.service_id)]?.name||'Proyecto')}</div>
         <h2>${esc(p.title)}</h2>
         <p class="lead">${esc(p.location||'')} ${p.project_date?'· '+esc(p.project_date):''}</p>
         <p style="color:#b9cce0;margin:14px 0 22px">${esc(p.description||'')}</p>
@@ -352,7 +352,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
       const im=mediaFor(p)[0]?.public_url;
       return `<article class="project dynamic-project" data-id="${esc(p.id)}"
         style="${im?`background-image:url('${esc(im)}');background-size:cover;background-position:center`:''}">
-        <span class="tag">${esc(serviceById[p.service_id]?.name||'SEAIRE')}</span>
+        <span class="tag">${esc(serviceById[String(p.service_id)]?.name||'SEAIRE')}</span>
         <h3>${esc(p.title)}</h3>
         <p style="color:#c6d7e8;font-size:13px">${esc(p.location||'')} ${p.project_date?'· '+esc(p.project_date):''}</p>
       </article>`;
@@ -373,8 +373,8 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
 
     serviceCards.querySelectorAll('.service-card').forEach(card=>{
       card.addEventListener('click',()=>{
-        const list=projects.filter(p=>p.service_id===card.dataset.service);
-        const title=serviceById[card.dataset.service]?.name||'Trabajos';
+        const list=projects.filter(p=>String(p.service_id)===String(card.dataset.service));
+        const title=serviceById[String(card.dataset.service)]?.name||'Trabajos';
         const modal=document.getElementById('galleryModal');
         const g=document.getElementById('galleryGrid');
         document.getElementById('galleryTitle').textContent=title;
@@ -408,7 +408,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
     Object.assign(c.quote,{eyebrow:q.eyebrow??c.quote.eyebrow,title:q.titulo??c.quote.title,description:q.descripcion??c.quote.description,button:q.button??c.quote.button});
     Object.assign(c.contact,{eyebrow:co.eyebrow??c.contact.eyebrow,title:co.titulo??c.contact.title,description:co.descripcion??c.contact.description,whatsapp:co.whatsapp??c.contact.whatsapp,phoneLink:co.phoneLink??c.contact.phoneLink,email:co.correo??c.contact.email});
     if(b.nav)c.nav={...c.nav,...b.nav}; if(b.footer)c.footer={...c.footer,...b.footer}; if(b.seo)c.seo={...c.seo,...b.seo};
-    c.services=services.map(sv=>({id:sv.id,icon:sv.icon||'⚡',name:sv.name,description:sv.description||'',enabled:sv.enabled!==false}));
+    c.services=services.map(sv=>({id:String(sv.id),icon:sv.icon||'⚡',name:sv.name||'',description:sv.description||'',enabled:sv.enabled!==false}));
     SEAIRE_CONFIG.write(c);
     document.title=c.seo.title;
   }catch(e){console.warn('No se pudo cargar contenido editable desde Supabase:',e);}

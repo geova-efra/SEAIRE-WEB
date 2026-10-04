@@ -14,8 +14,12 @@
   window.SEAIRE_CLOUD = {
     esc,
     async services(){
-      const {data,error}=await seaireSupabase.from('services').select('*').order('sort_order');
-      if(error) throw error; return data||[];
+      // Los servicios editables se almacenan dentro de site_settings (section=servicios)
+      // para no depender de columnas variables de una tabla services existente.
+      const {data,error}=await seaireSupabase.from('site_settings').select('data').eq('section','servicios').maybeSingle();
+      if(error) throw error;
+      const items=data?.data?.items;
+      return Array.isArray(items) ? items : [];
     },
     async settings(section){
       const {data,error}=await seaireSupabase.from('site_settings').select('section,data').eq('section',section).maybeSingle();

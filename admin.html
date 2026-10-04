@@ -241,7 +241,7 @@ button,input,select,textarea{font:inherit}
    Mantiene la interfaz de este admin e integra:
    - autenticación
    - contenido institucional
-   - servicios (enabled)
+   - servicios editables guardados en site_settings (section=servicios)
    - proyectos (service_id + project_media)
    - fotografías y videos en Storage
    ========================================================= */
@@ -290,7 +290,7 @@ function sectionPayloads(){
     empresa:{nombre:cfg.brand.name,legal:cfg.brand.legal,eslogan:cfg.brand.tagline,logo:cfg.brand.logo},
     inicio:{badge:cfg.hero.badge,titulo:cfg.hero.title,highlight:cfg.hero.highlight,descripcion:cfg.hero.description,primary:cfg.hero.primary,secondary:cfg.hero.secondary},
     nosotros:{eyebrow:cfg.about.eyebrow,titulo:cfg.about.title,whoTitle:cfg.about.whoTitle,quienes_somos:cfg.about.who,mision:cfg.about.mission,vision:cfg.about.vision},
-    servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description},
+    servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description,items:(services.length?services:cfg.services).map((x,i)=>({id:String(x.id||('srv_'+i)),name:x.name||'',icon:x.icon||'⚡',description:x.description||'',enabled:x.enabled!==false,sort_order:Number(x.sort_order??i)}))},
     proyectos:{eyebrow:cfg.projectsHead.eyebrow,titulo:cfg.projectsHead.title,descripcion:cfg.projectsHead.description},
     cotizacion:{eyebrow:cfg.quote.eyebrow,titulo:cfg.quote.title,descripcion:cfg.quote.description,button:cfg.quote.button},
     contacto:{eyebrow:cfg.contact.eyebrow,titulo:cfg.contact.title,descripcion:cfg.contact.description,whatsapp:cfg.contact.whatsapp,phoneLink:cfg.contact.phoneLink,correo:cfg.contact.email},
@@ -346,6 +346,21 @@ async function loadCloudSettings(){
   }));
   const rows=Object.fromEntries(results);
   applyCloudSettingsToConfig(rows);
+  // Los servicios viven dentro de la configuración de la sección servicios.
+  if(Array.isArray(rows.servicios?.items)){
+    services=rows.servicios.items.map((x,i)=>({
+      id:String(x.id||('srv_'+Date.now().toString(36)+'_'+i)),
+      name:String(x.name||''),
+      icon:String(x.icon||'⚡'),
+      description:String(x.description||''),
+      enabled:x.enabled!==false,
+      sort_order:Number(x.sort_order??i)
+    }));
+    cfg.services=services.map(x=>({...x}));
+  }else{
+    services=(cfg.services||[]).map((x,i)=>({...x,sort_order:Number(x.sort_order??i)}));
+    cfg.services=services.map(x=>({...x}));
+  }
   bindFields();renderNav();renderLogo();
 }
 
@@ -387,10 +402,18 @@ $('loginForm').addEventListener('submit',async e=>{
 });
 $('logout').onclick=async()=>{try{if(client)await client.auth.signOut()}finally{$('adminApp').classList.add('hidden');$('loginScreen').classList.remove('hidden');$('password').value=''}};
 
-/* SERVICES - schema real: enabled */
+/* SERVICES - almacenados en site_settings para evitar depender del schema de services */
 async function loadServices(){
-  const {data,error}=await client.from('services').select('*').order('sort_order',{ascending:true});
-  if(error)throw error;services=data||[];return services;
+  const {data,error}=await client.from('site_settings').select('data').eq('section','servicios').maybeSingle();
+  if(error)throw error;
+  const items=Array.isArray(data?.data?.items)?data.data.items:null;
+  if(items){
+    services=items.map((s,i)=>({id:String(s.id||('srv_'+Date.now().toString(36)+'_'+i)),name:String(s.name||''),icon:String(s.icon||'⚡'),description:String(s.description||''),enabled:s.enabled!==false,sort_order:Number(s.sort_order??i)}));
+  }else{
+    services=(cfg?.services||[]).map((s,i)=>({...s,sort_order:Number(s.sort_order??i)}));
+  }
+  cfg.services=services.map(s=>({...s}));
+  return services;
 }
 function serviceOptions(){return services.filter(s=>s.enabled!==false).map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')||'<option value="">Sin servicios activos</option>'}
 async function renderServices(){
@@ -400,18 +423,43 @@ async function renderServices(){
 function newService(){$('serviceEditor').classList.remove('hidden');$('serviceForm').reset();$('sid').value='';$('sicon').value='⚡';$('senabled').checked=true;$('serviceFormTitle').textContent='Nuevo servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
 function editService(id){const s=services.find(x=>String(x.id)===String(id));if(!s)return;$('serviceEditor').classList.remove('hidden');$('sid').value=s.id;$('sname').value=s.name||'';$('sicon').value=s.icon||'⚡';$('sdescription').value=s.description||'';$('senabled').checked=s.enabled!==false;$('serviceFormTitle').textContent='Editar servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
 function cancelService(){$('serviceEditor').classList.add('hidden')}
+async function saveServicesToCloud(){
+  const current=(services||[]).map((x,i)=>({id:String(x.id||('srv_'+i)),name:String(x.name||''),icon:String(x.icon||'⚡'),description:String(x.description||''),enabled:x.enabled!==false,sort_order:Number(x.sort_order??i)}));
+  const {data:row,error:getErr}=await client.from('site_settings').select('data').eq('section','servicios').maybeSingle();
+  if(getErr)throw getErr;
+  const previous=row?.data||{};
+  const data={...previous,items:current};
+  const {error}=await client.from('site_settings').upsert({section:'servicios',data,updated_at:new Date().toISOString()},{onConflict:'section'});
+  if(error)throw error;
+  cfg.services=current.map(x=>({...x}));
+  if(window.SEAIRE_CONFIG)window.SEAIRE_CONFIG.write(cfg);
+}
 $('serviceForm').addEventListener('submit',async e=>{
   e.preventDefault();$('saveServiceBtn').disabled=true;
   try{
     const obj={name:$('sname').value.trim(),icon:$('sicon').value.trim()||'⚡',description:$('sdescription').value.trim(),enabled:$('senabled').checked};
-    const id=$('sid').value;let result;
-    if(id)result=await client.from('services').update(obj).eq('id',id);
-    else{const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),0);obj.sort_order=max+1;result=await client.from('services').insert(obj)}
-    if(result.error)throw result.error;cancelService();toast('Servicio guardado correctamente.');await renderServices();
+    const id=$('sid').value;
+    if(id){
+      const i=services.findIndex(s=>String(s.id)===String(id));
+      if(i<0)throw new Error('No se encontró el servicio seleccionado.');
+      services[i]={...services[i],...obj};
+    }else{
+      const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1);
+      services.push({id:'srv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),...obj,sort_order:max+1});
+    }
+    await saveServicesToCloud();
+    cancelService();toast('Servicio guardado correctamente.');await renderServices();
   }catch(err){toast('No se pudo guardar el servicio: '+err.message)}finally{$('saveServiceBtn').disabled=false}
 });
-async function toggleService(id,current){const {error}=await client.from('services').update({enabled:!current}).eq('id',id);if(error)toast(error.message);else{toast('Estado actualizado.');await renderServices()}}
-async function deleteService(id){if(!confirm('¿Eliminar este servicio?'))return;const {error}=await client.from('services').delete().eq('id',id);if(error)toast('No se pudo eliminar: '+error.message);else{toast('Servicio eliminado.');await renderServices()}}
+async function toggleService(id,current){
+  try{const i=services.findIndex(s=>String(s.id)===String(id));if(i<0)throw new Error('Servicio no encontrado.');services[i].enabled=!current;await saveServicesToCloud();toast('Estado actualizado.');await renderServices();}
+  catch(e){toast('No se pudo actualizar: '+e.message)}
+}
+async function deleteService(id){
+  if(!confirm('¿Eliminar este servicio?'))return;
+  try{services=services.filter(s=>String(s.id)!==String(id));await saveServicesToCloud();toast('Servicio eliminado.');await renderServices();}
+  catch(e){toast('No se pudo eliminar: '+e.message)}
+}
 
 /* PROJECTS - schema real: service_id + project_media */
 function projectMedia(p){return p.project_media||[]}
