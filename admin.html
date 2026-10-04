@@ -313,7 +313,7 @@ function saveAll(){
 }
 
 function renderStats(projectRows=null){
-  $('sCount').textContent=services.filter(s=>s.enabled!==false).length;
+  $('sCount').textContent=services.filter(s=>s.active!==false).length;
   if(projectRows){
     $('pCount').textContent=projectRows.length;
     $('photoCount').textContent=projectRows.reduce((n,p)=>n+(Array.isArray(p.images)?p.images.length:0),0);
@@ -398,7 +398,7 @@ async function loadServices(){
 }
 
 function serviceOptions(){
-  return services.filter(s=>s.enabled!==false)
+  return services.filter(s=>s.active!==false)
     .map(s=>`<option value="${esc(s.name)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')
     || '<option value="">Sin servicios activos</option>';
 }
@@ -410,10 +410,10 @@ async function renderServices(){
       <div class="service-row">
         <div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div>
         <div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small></div>
-        <div><span style="color:${s.enabled===false?'#ff9eae':'#7ff0c2'}">${s.enabled===false?'INACTIVO':'ACTIVO'}</span></div>
+        <div><span style="color:${s.active===false?'#ff9eae':'#7ff0c2'}">${s.active===false?'INACTIVO':'ACTIVO'}</span></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button>
-          <button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.enabled!==false})">${s.enabled===false?'Activar':'Desactivar'}</button>
+          <button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.active!==false})">${s.active===false?'Activar':'Desactivar'}</button>
           <button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button>
         </div>
       </div>`).join('') || '<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';
@@ -441,7 +441,7 @@ function editService(id){
   $('sname').value=s.name||'';
   $('sicon').value=s.icon||'⚡';
   $('sdescription').value=s.description||'';
-  $('senabled').checked=s.enabled!==false;
+  $('senabled').checked=s.active!==false;
   $('serviceFormTitle').textContent='Editar servicio';
   $('serviceEditor').scrollIntoView({behavior:'smooth'});
 }
@@ -456,7 +456,7 @@ $('serviceForm').addEventListener('submit',async e=>{
       name:$('sname').value.trim(),
       icon:$('sicon').value.trim()||'⚡',
       description:$('sdescription').value.trim(),
-      enabled:$('senabled').checked
+      active:$('senabled').checked
     };
     const id=$('sid').value;
     let result;
@@ -477,7 +477,7 @@ $('serviceForm').addEventListener('submit',async e=>{
 });
 
 async function toggleService(id,current){
-  const {error}=await client.from('services').update({enabled:!current}).eq('id',id);
+  const {error}=await client.from('services').update({active:!current}).eq('id',id);
   if(error)toast(error.message);
   else{toast('Estado del servicio actualizado.');await renderServices()}
 }
