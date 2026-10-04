@@ -60,5 +60,5 @@ function merge(base, saved){
 }
 function read(){try{return merge(DEFAULT,JSON.parse(localStorage.getItem(KEY)||'null'))}catch(e){return clone(DEFAULT)}}
 function write(v){localStorage.setItem(KEY,JSON.stringify(v));dispatchEvent(new CustomEvent('seaire-config-updated',{detail:v}));return v}
-window.SEAIRE_CONFIG={KEY,DEFAULT,read,write,clone,SUPABASE_URL:'https://xybslfqvoupmkxhybeul.supabase.co',SUPABASE_ANON_KEY:'sb_publishable_zdFfxY43JQCdtV6ivlZCuA_aca9iI1f'};
+window.SEAIRE_CONFIG={KEY,DEFAULT,read,write,clone};
 })();

@@ -236,314 +236,522 @@ button,input,select,textarea{font:inherit}
 <script src="seaire-projects.js"></script>
 <script>
 /* =========================================================
-   SEAIRE ADMIN - INTERFAZ ACTUAL + FUNCIONES CLOUD
-   Fuente de verdad: Supabase.
-   Mantiene la interfaz de este admin e integra:
-   - autenticación
-   - contenido institucional
-   - servicios editables guardados en la tabla services
-   - proyectos (service_id + project_media)
-   - fotografías y videos en Storage
+   SEAIRE ADMIN INTEGRADO
+   - Mantiene la interfaz del admin actual.
+   - Integra autenticación, proyectos y servicios de admin-ok.
+   - No usa service_role; solo clave publishable/anon.
    ========================================================= */
 
-const SUPABASE_URL = window.SEAIRE_CONFIG?.SUPABASE_URL || 'https://xybslfqvoupmkxhybeul.supabase.co';
-const SUPABASE_KEY = window.SEAIRE_CONFIG?.SUPABASE_ANON_KEY || 'sb_publishable_zdFfxY43JQCdtV6ivlZCuA_aca9iI1f';
+const SUPABASE_URL = 'https://xybslfqvoupmkxhybeul.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zdFfxY43JQCdtV6ivlZCuA_aca9iI1f';
 
-let client=null;
-let cfg=null;
-let services=[];
-let projects=[];
-let currentMedia=[];
-let pendingPhotos=[];
-let pendingVideo=null;
+let client = null;
+let cfg = null;
+let services = [];
+let currentImages = [];
+let currentImagePaths = [];
+let currentVideo = null;
+let currentVideoPath = null;
 
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 
-function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3000)}
-function showLoginMessage(t,ok=false){$('loginMsg').textContent=t;$('loginMsg').className='login-msg '+(ok?'ok':'')}
+function toast(t){
+  const e=$('toast'); e.textContent=t; e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),2400);
+}
+
+function showLoginMessage(t,ok=false){
+  $('loginMsg').textContent=t;
+  $('loginMsg').className='login-msg '+(ok?'ok':'');
+}
 
 function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  const sec=$(id);if(sec)sec.classList.add('active');
+  const sec=$(id); if(sec) sec.classList.add('active');
   document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.tab===id));
   const active=document.querySelector('.nav a.active');
   $('pageTitle').textContent=active?active.textContent.replace(/^[^A-Za-zÁÉÍÓÚÑ]+/,'').trim():id;
-  if(location.hash.slice(1)!==id)history.replaceState(null,'','#'+id);
-  if(id==='servicios')renderServices();
-  if(id==='proyectos')renderProjects();
+  if(location.hash.slice(1)!==id) history.replaceState(null,'','#'+id);
+  if(id==='servicios') renderServices();
+  if(id==='proyectos') renderProjects();
 }
-document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();showSection(a.dataset.tab)});
+
+document.querySelectorAll('[data-tab]').forEach(a=>a.onclick=e=>{
+  e.preventDefault(); showSection(a.dataset.tab);
+});
 
 function get(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)}
-function set(obj,path,val){const p=path.split('.');let o=obj;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=val}
-function bindFields(){document.querySelectorAll('[data-bind]').forEach(e=>{const p=e.dataset.bind;e.value=get(cfg,p)??'';e.oninput=()=>set(cfg,p,e.value)})}
+function set(obj,path,val){
+  const a=path.split('.'); let o=obj;
+  for(let i=0;i<a.length-1;i++) o=o[a[i]];
+  o[a[a.length-1]]=val;
+}
+
+function bindFields(){
+  document.querySelectorAll('[data-bind]').forEach(e=>{
+    const p=e.dataset.bind;
+    e.value=get(cfg,p)??'';
+    e.oninput=()=>set(cfg,p,e.value);
+  });
+}
+
 function renderNav(){
   const labels={inicio:'Inicio',servicios:'Servicios',proyectos:'Proyectos',nosotros:'Nosotros',cotizacion:'Cotización',contacto:'Contacto',cta:'Botón'};
-  $('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k]||'')}"></div>`).join('');
-  $('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value)
-}
-function renderLogo(){const p=$('logoPreview');p.innerHTML=cfg?.brand?.logo?`<img src="${esc(cfg.brand.logo)}" alt="Logo">`:''}
-
-function renderStats(projectRows=null){
-  const serviceCount=Array.isArray(services)?services.filter(s=>s.active!==false).length:0;
-  const rows=Array.isArray(projectRows)?projectRows:projects;
-  const photoCount=rows.reduce((n,p)=>n+(Array.isArray(p.project_media)?p.project_media.filter(m=>m.media_type==='image').length:0),0);
-  const videoCount=rows.reduce((n,p)=>n+(Array.isArray(p.project_media)?p.project_media.filter(m=>m.media_type==='video').length:0),0);
-  if($('sCount'))$('sCount').textContent=serviceCount;
-  if($('pCount'))$('pCount').textContent=rows.length;
-  if($('photoCount'))$('photoCount').textContent=photoCount;
-  if($('videoCount'))$('videoCount').textContent=videoCount;
+  $('navEditor').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="field"><label>${l}</label><input data-n="${k}" value="${esc(cfg.nav[k])}"></div>`).join('');
+  $('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value);
 }
 
-function sectionPayloads(){
-  return {
-    empresa:{nombre:cfg.brand.name,legal:cfg.brand.legal,eslogan:cfg.brand.tagline,logo:cfg.brand.logo},
-    inicio:{badge:cfg.hero.badge,titulo:cfg.hero.title,highlight:cfg.hero.highlight,descripcion:cfg.hero.description,primary:cfg.hero.primary,secondary:cfg.hero.secondary},
-    nosotros:{eyebrow:cfg.about.eyebrow,titulo:cfg.about.title,whoTitle:cfg.about.whoTitle,quienes_somos:cfg.about.who,mision:cfg.about.mission,vision:cfg.about.vision},
-    servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description},
-    proyectos:{eyebrow:cfg.projectsHead.eyebrow,titulo:cfg.projectsHead.title,descripcion:cfg.projectsHead.description},
-    cotizacion:{eyebrow:cfg.quote.eyebrow,titulo:cfg.quote.title,descripcion:cfg.quote.description,button:cfg.quote.button},
-    contacto:{eyebrow:cfg.contact.eyebrow,titulo:cfg.contact.title,descripcion:cfg.contact.description,whatsapp:cfg.contact.whatsapp,phoneLink:cfg.contact.phoneLink,correo:cfg.contact.email},
-    respaldo:{nav:cfg.nav,footer:cfg.footer,seo:cfg.seo}
-  };
-}
-
-function applyCloudSettingsToConfig(rows){
-  const r=rows||{};
-  const e=r.empresa||{},i=r.inicio||{},n=r.nosotros||{},s=r.servicios||{},p=r.proyectos||{},q=r.cotizacion||{},c=r.contacto||{},b=r.respaldo||{};
-  if(e.nombre!==undefined)cfg.brand.name=e.nombre;
-  if(e.legal!==undefined)cfg.brand.legal=e.legal;
-  if(e.eslogan!==undefined)cfg.brand.tagline=e.eslogan;
-  if(e.logo!==undefined)cfg.brand.logo=e.logo;
-  if(i.badge!==undefined)cfg.hero.badge=i.badge;
-  if(i.titulo!==undefined)cfg.hero.title=i.titulo;
-  if(i.highlight!==undefined)cfg.hero.highlight=i.highlight;
-  if(i.descripcion!==undefined)cfg.hero.description=i.descripcion;
-  if(i.primary!==undefined)cfg.hero.primary=i.primary;
-  if(i.secondary!==undefined)cfg.hero.secondary=i.secondary;
-  if(n.eyebrow!==undefined)cfg.about.eyebrow=n.eyebrow;
-  if(n.titulo!==undefined)cfg.about.title=n.titulo;
-  if(n.whoTitle!==undefined)cfg.about.whoTitle=n.whoTitle;
-  if(n.quienes_somos!==undefined)cfg.about.who=n.quienes_somos;
-  if(n.mision!==undefined)cfg.about.mission=n.mision;
-  if(n.vision!==undefined)cfg.about.vision=n.vision;
-  if(s.eyebrow!==undefined)cfg.servicesHead.eyebrow=s.eyebrow;
-  if(s.titulo!==undefined)cfg.servicesHead.title=s.titulo;
-  if(s.descripcion!==undefined)cfg.servicesHead.description=s.descripcion;
-  if(p.eyebrow!==undefined)cfg.projectsHead.eyebrow=p.eyebrow;
-  if(p.titulo!==undefined)cfg.projectsHead.title=p.titulo;
-  if(p.descripcion!==undefined)cfg.projectsHead.description=p.descripcion;
-  if(q.eyebrow!==undefined)cfg.quote.eyebrow=q.eyebrow;
-  if(q.titulo!==undefined)cfg.quote.title=q.titulo;
-  if(q.descripcion!==undefined)cfg.quote.description=q.descripcion;
-  if(q.button!==undefined)cfg.quote.button=q.button;
-  if(c.eyebrow!==undefined)cfg.contact.eyebrow=c.eyebrow;
-  if(c.titulo!==undefined)cfg.contact.title=c.titulo;
-  if(c.descripcion!==undefined)cfg.contact.description=c.descripcion;
-  if(c.whatsapp!==undefined)cfg.contact.whatsapp=c.whatsapp;
-  if(c.phoneLink!==undefined)cfg.contact.phoneLink=c.phoneLink;
-  if(c.correo!==undefined)cfg.contact.email=c.correo;
-  if(b.nav)cfg.nav={...cfg.nav,...b.nav};
-  if(b.footer)cfg.footer={...cfg.footer,...b.footer};
-  if(b.seo)cfg.seo={...cfg.seo,...b.seo};
-}
-
-async function getCloudConfig(){
-  const {data,error}=await client.from('site_settings').select('*').limit(1).maybeSingle();
-  if(error)throw error;
-  return data||null;
-}
-
-async function loadCloudSettings(){
-  const row=await getCloudConfig();
-  const cloud=row?.config_json&&typeof row.config_json==='object'?row.config_json:{};
-  // Compatibilidad con la estructura real actual de site_settings.
-  if(row){
-    cloud.empresa={...(cloud.empresa||{}),nombre:cloud.empresa?.nombre??row.company_name??'',eslogan:cloud.empresa?.eslogan??row.tagline??'',legal:cloud.empresa?.legal??cfg.brand.legal,logo:cloud.empresa?.logo??cfg.brand.logo};
-    cloud.nosotros={...(cloud.nosotros||{}),quienes_somos:cloud.nosotros?.quienes_somos??row.about_text??'',mision:cloud.nosotros?.mision??row.mission??'',vision:cloud.nosotros?.vision??row.vision??''};
-    cloud.contacto={...(cloud.contacto||{}),whatsapp:cloud.contacto?.whatsapp??row.whatsapp??'',correo:cloud.contacto?.correo??row.email??'',ubicacion:cloud.contacto?.ubicacion??row.address??''};
-  }
-  applyCloudSettingsToConfig(cloud);
-  bindFields();renderNav();renderLogo();
+function renderLogo(){
+  const p=$('logoPreview');
+  p.innerHTML=cfg?.brand?.logo?`<img src="${esc(cfg.brand.logo)}" alt="Logo">`:'';
 }
 
 async function saveAll(){
   try{
-    const sections=sectionPayloads();
-    const current=await getCloudConfig();
-    const config_json={...(current?.config_json||{}),...sections,servicios:{...(current?.config_json?.servicios||{}),...sections.servicios},proyectos:{...(current?.config_json?.proyectos||{}),...sections.proyectos}};
-    const payload={
-      company_name:cfg.brand.name||'SEAIRE',
-      tagline:cfg.brand.tagline||'',
-      about_text:cfg.about.who||'',
-      mission:cfg.about.mission||'',
-      vision:cfg.about.vision||'',
-      whatsapp:cfg.contact.whatsapp||'',
-      email:cfg.contact.email||'',
-      address:current?.address||'',
-      config_json,
-      updated_at:new Date().toISOString()
+    if(!client) throw new Error('Supabase no está conectado.');
+    if(window.SEAIRE_CONFIG) window.SEAIRE_CONFIG.write(cfg);
+    const sections={
+      empresa:{nombre:cfg.brand.name,razon_social:cfg.brand.legal,eslogan:cfg.brand.tagline,logo:cfg.brand.logo},
+      inicio:{badge:cfg.hero.badge,titulo:cfg.hero.title,highlight:cfg.hero.highlight,descripcion:cfg.hero.description,boton_principal:cfg.hero.primary,boton_secundario:cfg.hero.secondary},
+      nosotros:{eyebrow:cfg.about.eyebrow,titulo:cfg.about.title,quienes_titulo:cfg.about.whoTitle,quienes_somos:cfg.about.who,mision:cfg.about.mission,vision:cfg.about.vision},
+      servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description},
+      proyectos:{eyebrow:cfg.projectsHead.eyebrow,titulo:cfg.projectsHead.title,descripcion:cfg.projectsHead.description},
+      cotizacion:{eyebrow:cfg.quote.eyebrow,titulo:cfg.quote.title,descripcion:cfg.quote.description,boton:cfg.quote.button},
+      contacto:{eyebrow:cfg.contact.eyebrow,titulo:cfg.contact.title,descripcion:cfg.contact.description,whatsapp:cfg.contact.whatsapp,phoneLink:cfg.contact.phoneLink,correo:cfg.contact.email},
+      seo:{...cfg.seo},
+      navegacion:{...cfg.nav,footerCopyright:cfg.footer.copyright}
     };
-    let result;
-    if(current?.id) result=await client.from('site_settings').update(payload).eq('id',current.id);
-    else result=await client.from('site_settings').insert(payload);
-    if(result.error)throw result.error;
-    if(window.SEAIRE_CONFIG)window.SEAIRE_CONFIG.write(cfg);
-    toast('Cambios guardados en Supabase y listos para la página pública.');
-  }catch(e){toast('No se pudo guardar el contenido: '+e.message)}
+    for(const [section,data] of Object.entries(sections)){
+      const {error}=await client.from('site_settings').upsert({section,data,updated_at:new Date().toISOString()},{onConflict:'section'});
+      if(error) throw error;
+    }
+    toast('Cambios guardados en Supabase y disponibles para la página pública.');
+  }catch(e){toast('No se pudo guardar: '+e.message)}
 }
 
-/* AUTH */
+function renderStats(projectRows=null){
+  $('sCount').textContent=services.filter(s=>s.active!==false && s.enabled!==false).length;
+  if(projectRows){
+    $('pCount').textContent=projectRows.length;
+    $('photoCount').textContent=projectRows.reduce((n,p)=>n+(Array.isArray(p.images)?p.images.length:0),0);
+    $('videoCount').textContent=projectRows.filter(p=>p.video_url).length;
+  }
+}
+
+/* ---------------- AUTENTICACIÓN SUPABASE ---------------- */
+
 async function startAuth(){
-  if(!window.supabase){showLoginMessage('No se pudo cargar Supabase. Verifica tu conexión.');$('loginScreen').classList.remove('hidden');$('authLoading').classList.add('hidden');return}
-  client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);window.seaireSupabase=client;
-  try{
-    const {data,error}=await client.auth.getSession();if(error)throw error;
-    if(data.session)await enterAdmin();else{$('authLoading').classList.add('hidden');$('loginScreen').classList.remove('hidden')}
-  }catch(err){$('authLoading').classList.add('hidden');$('loginScreen').classList.remove('hidden');showLoginMessage('No se pudo comprobar la sesión: '+err.message)}
-  client.auth.onAuthStateChange(async(_event,session)=>{if(session)await enterAdmin();else{$('adminApp').classList.add('hidden');$('loginScreen').classList.remove('hidden');$('authLoading').classList.add('hidden')}})
-}
-$('loginForm').addEventListener('submit',async e=>{
-  e.preventDefault();if(!client){showLoginMessage('Supabase todavía no está listo.');return}
-  $('loginBtn').disabled=true;$('loginBtn').textContent='Ingresando...';showLoginMessage('');
-  try{const {error}=await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)showLoginMessage('No se pudo iniciar sesión: '+error.message);else $('password').value=''}catch(err){showLoginMessage('Error de conexión con Supabase: '+err.message)}finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Ingresar'}
-});
-$('logout').onclick=async()=>{try{if(client)await client.auth.signOut()}finally{$('adminApp').classList.add('hidden');$('loginScreen').classList.remove('hidden');$('password').value=''}};
+  if(!window.supabase){
+    showLoginMessage('No se pudo cargar la librería de Supabase. Verifica tu conexión a Internet.');
+    $('loginScreen').classList.remove('hidden');
+    $('authLoading').classList.add('hidden');
+    return;
+  }
 
-/* SERVICES - usa el esquema REAL de public.services:
-   id, title, description, icon, image_url, sort_order, active, created_at, updated_at */
+  client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  window.seaireSupabase=client;
+
+  try{
+    const {data,error}=await client.auth.getSession();
+    if(error) throw error;
+    if(data.session) await enterAdmin();
+    else{
+      $('authLoading').classList.add('hidden');
+      $('loginScreen').classList.remove('hidden');
+    }
+  }catch(err){
+    $('authLoading').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    showLoginMessage('No se pudo comprobar la sesión: '+err.message);
+  }
+
+  client.auth.onAuthStateChange(async (_event,session)=>{
+    if(session) await enterAdmin();
+    else{
+      $('adminApp').classList.add('hidden');
+      $('loginScreen').classList.remove('hidden');
+      $('authLoading').classList.add('hidden');
+    }
+  });
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!client){showLoginMessage('Supabase todavía no está listo.');return}
+  $('loginBtn').disabled=true;
+  $('loginBtn').textContent='Ingresando...';
+  showLoginMessage('');
+  try{
+    const {error}=await client.auth.signInWithPassword({
+      email:$('email').value.trim(),
+      password:$('password').value
+    });
+    if(error) showLoginMessage('No se pudo iniciar sesión: '+error.message);
+    else $('password').value='';
+  }catch(err){
+    showLoginMessage('Error de conexión con Supabase: '+err.message);
+  }finally{
+    $('loginBtn').disabled=false;
+    $('loginBtn').textContent='Ingresar';
+  }
+});
+
+$('logout').onclick=async()=>{
+  try{ if(client) await client.auth.signOut(); }
+  finally{
+    $('adminApp').classList.add('hidden');
+    $('loginScreen').classList.remove('hidden');
+    $('password').value='';
+  }
+};
+
+/* ---------------- SERVICIOS SUPABASE ---------------- */
+
 async function loadServices(){
-  const {data,error}=await client.from('services').select('id,title,description,icon,image_url,sort_order,active,created_at,updated_at').order('sort_order',{ascending:true});
-  if(error)throw error;
-  services=(data||[]).map((s,i)=>({
-    id:s.id,
-    name:String(s.title||''),
-    title:String(s.title||''),
-    icon:String(s.icon||'⚡'),
-    description:String(s.description||''),
-    image_url:s.image_url||null,
-    enabled:s.active!==false,
-    active:s.active!==false,
-    sort_order:Number(s.sort_order??i)
-  }));
-  cfg.services=services.map(s=>({...s}));
+  const {data,error}=await client.from('services').select('*').order('sort_order',{ascending:true});
+  if(error) throw error;
+  services=data||[];
   return services;
 }
-function serviceOptions(){return services.filter(s=>s.active!==false).map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')||'<option value="">Sin servicios activos</option>'}
+
+function serviceOptions(){
+  return services.filter(s=>s.active!==false)
+    .map(s=>`<option value="${esc(s.title||s.title||s.name||'')}">${esc(s.icon||'⚡')} ${esc(s.title||s.title||s.name||'')}</option>`).join('')
+    || '<option value="">Sin servicios activos</option>';
+}
+
 async function renderServices(){
   try{
     await loadServices();
-    $('serviceList').innerHTML=services.map(s=>`<div class="service-row"><div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div><div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small></div><div><span style="color:${s.active===false?'#ff9eae':'#7ff0c2'}">${s.active===false?'INACTIVO':'ACTIVO'}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button><button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.active!==false})">${s.active===false?'Activar':'Desactivar'}</button><button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button></div></div>`).join('')||'<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';
+    $('serviceList').innerHTML=services.map(s=>`
+      <div class="service-row">
+        <div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div>
+        <div><strong>${esc(s.title||s.title||s.name||'')}</strong><br><small>${esc(s.description||'')}</small></div>
+        <div><span style="color:${s.active===false?'#ff9eae':'#7ff0c2'}">${s.active===false?'INACTIVO':'ACTIVO'}</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button>
+          <button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.active!==false})">${s.active===false?'Activar':'Desactivar'}</button>
+          <button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button>
+        </div>
+      </div>`).join('') || '<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';
     renderStats();
-  }catch(err){$('serviceList').innerHTML='<div style="padding:20px;color:#ffb3b3">No se pudieron cargar los servicios: '+esc(err.message)+'</div>'}
+  }catch(err){
+    $('serviceList').innerHTML='<div style="padding:20px;color:#ffb3b3">No se pudieron cargar los servicios: '+esc(err.message)+'</div>';
+  }
 }
-function newService(){$('serviceEditor').classList.remove('hidden');$('serviceForm').reset();$('sid').value='';$('sicon').value='⚡';$('senabled').checked=true;$('serviceFormTitle').textContent='Nuevo servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
-function editService(id){const s=services.find(x=>String(x.id)===String(id));if(!s)return;$('serviceEditor').classList.remove('hidden');$('sid').value=s.id;$('sname').value=s.name||'';$('sicon').value=s.icon||'⚡';$('sdescription').value=s.description||'';$('senabled').checked=s.active!==false;$('serviceFormTitle').textContent='Editar servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
+
+function newService(){
+  $('serviceEditor').classList.remove('hidden');
+  $('serviceForm').reset();
+  $('sid').value='';
+  $('sicon').value='⚡';
+  $('senabled').checked=true;
+  $('serviceFormTitle').textContent='Nuevo servicio';
+  $('serviceEditor').scrollIntoView({behavior:'smooth'});
+}
+
+function editService(id){
+  const s=services.find(x=>String(x.id)===String(id));
+  if(!s)return;
+  $('serviceEditor').classList.remove('hidden');
+  $('sid').value=s.id;
+  $('sname').value=s.title||s.name||'';
+  $('sicon').value=s.icon||'⚡';
+  $('sdescription').value=s.description||'';
+  $('senabled').checked=s.active!==false;
+  $('serviceFormTitle').textContent='Editar servicio';
+  $('serviceEditor').scrollIntoView({behavior:'smooth'});
+}
+
 function cancelService(){$('serviceEditor').classList.add('hidden')}
+
 $('serviceForm').addEventListener('submit',async e=>{
-  e.preventDefault();$('saveServiceBtn').disabled=true;
+  e.preventDefault();
+  $('saveServiceBtn').disabled=true;
   try{
-    const title=$('sname').value.trim();
-    const description=$('sdescription').value.trim();
-    if(!title)throw new Error('El nombre del servicio es obligatorio.');
-    if(!description)throw new Error('La descripción del servicio es obligatoria.');
-    const obj={title,icon:$('sicon').value.trim()||'⚡',description,active:$('senabled').checked,updated_at:new Date().toISOString()};
+    const obj={
+      title:$('sname').value.trim(),
+      icon:$('sicon').value.trim()||'⚡',
+      description:$('sdescription').value.trim(),
+      active:$('senabled').checked
+    };
     const id=$('sid').value;
     let result;
-    if(id) result=await client.from('services').update(obj).eq('id',id);
-    else{
-      const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1);
-      result=await client.from('services').insert({...obj,sort_order:max+1}).select().single();
+    if(id){
+      result=await client.from('services').update(obj).eq('id',id);
+    }else{
+      const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),0);
+      obj.sort_order=max+1;
+      result=await client.from('services').insert(obj);
     }
     if(result.error)throw result.error;
-    cancelService();toast('Servicio guardado correctamente.');await renderServices();
-  }catch(err){toast('No se pudo guardar el servicio: '+err.message)}finally{$('saveServiceBtn').disabled=false}
+    cancelService();
+    toast('Servicio guardado correctamente.');
+    await renderServices();
+  }catch(err){
+    toast('No se pudo guardar el servicio: '+err.message);
+  }finally{$('saveServiceBtn').disabled=false}
 });
+
 async function toggleService(id,current){
-  try{const {error}=await client.from('services').update({active:!current,updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;toast('Estado actualizado.');await renderServices();}
-  catch(e){toast('No se pudo actualizar: '+e.message)}
-}
-async function deleteService(id){
-  if(!confirm('¿Eliminar este servicio?'))return;
-  try{const {error}=await client.from('services').delete().eq('id',id);if(error)throw error;toast('Servicio eliminado.');await renderServices();}
-  catch(e){toast('No se pudo eliminar: '+e.message)}
+  const {error}=await client.from('services').update({active:!current}).eq('id',id);
+  if(error)toast(error.message);
+  else{toast('Estado del servicio actualizado.');await renderServices()}
 }
 
-/* PROJECTS - schema real: service_id + project_media */
-function projectMedia(p){return p.project_media||[]}
-async function loadProjects(){
-  const {data,error}=await client.from('projects').select('*,project_media(*)').order('created_at',{ascending:false});
-  if(error)throw error;projects=data||[];return projects;
+async function deleteService(id){
+  if(!confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.'))return;
+  const {error}=await client.from('services').delete().eq('id',id);
+  if(error)toast('No se pudo eliminar: '+error.message);
+  else{toast('Servicio eliminado.');await renderServices()}
 }
+
+/* ---------------- PROYECTOS SUPABASE ---------------- */
+
 async function renderProjects(){
   try{
-    await loadServices();await loadProjects();
-    $('projectRows').innerHTML=projects.length?projects.map(p=>{const s=services.find(x=>String(x.id)===String(p.service_id));const media=projectMedia(p);const imgs=media.filter(m=>m.media_type==='image').length;const vids=media.filter(m=>m.media_type==='video').length+(p.video_url?1:0);return `<tr><td><strong>${esc(p.title||'')}</strong><br><small>${p.project_date||''}</small></td><td>${esc(s?.name||p.service_id||'')}</td><td>${esc(p.location||'')}</td><td>${imgs} foto(s)${vids?' · '+vids+' video(s)':''}</td><td>${p.published?'PUBLICADO':'BORRADOR'}</td><td><button class="mini" onclick="editProject('${esc(p.id)}')">Editar</button> <button class="mini danger" onclick="deleteProject('${esc(p.id)}')">Eliminar</button></td></tr>`}).join(''):'<tr><td colspan="6" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>';
-    renderStats(projects);
-  }catch(err){$('projectRows').innerHTML='<tr><td colspan="6" style="padding:25px;color:#ffb3b3">No se pudieron cargar los proyectos: '+esc(err.message)+'</td></tr>'}
+    const {data,error}=await client.from('projects').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    const rows=data||[];
+    $('projectRows').innerHTML=rows.length?rows.map(p=>`
+      <tr>
+        <td><strong>${esc(p.title||'')}</strong><br><small>${p.year||''}</small></td>
+        <td>${esc(p.service||'')}</td>
+        <td>${esc(p.location||'')}</td>
+        <td>${Array.isArray(p.images)?p.images.length:0} foto(s)${p.video_url?' · video':''}</td>
+        <td>${p.published?'PUBLICADO':'BORRADOR'}</td>
+        <td>
+          <button class="mini" onclick="editProject('${esc(p.id)}')">Editar</button>
+          <button class="mini danger" onclick="deleteProject('${esc(p.id)}')">Eliminar</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="6" style="padding:25px;color:#9fb2c5;text-align:center">No hay proyectos.</td></tr>';
+    renderStats(rows);
+  }catch(err){
+    $('projectRows').innerHTML='<tr><td colspan="6" style="padding:25px;color:#ffb3b3">No se pudieron cargar los proyectos: '+esc(err.message)+'</td></tr>';
+  }
 }
+
 async function newProject(){
-  await loadServices();currentMedia=[];pendingPhotos=[];pendingVideo=null;$('projectEditor').style.display='block';$('projectForm').reset();$('projectId').value='';$('pyear').value='2026';$('ppublished').checked=true;$('pservice').innerHTML=serviceOptions();$('ppreview').innerHTML='';$('videoStatus').textContent='';$('projectFormTitle').textContent='Nuevo proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})
+  await loadServices();
+  currentImages=[];currentImagePaths=[];currentVideo=null;currentVideoPath=null;
+  $('projectEditor').style.display='block';
+  $('projectForm').reset();
+  $('projectId').value='';
+  $('pyear').value='2026';
+  $('ppublished').checked=true;
+  $('pservice').innerHTML=serviceOptions();
+  $('ppreview').innerHTML='';
+  $('videoStatus').textContent='';
+  $('projectFormTitle').textContent='Nuevo proyecto';
+  $('projectEditor').scrollIntoView({behavior:'smooth'});
 }
+
 async function editProject(id){
-  const {data,error}=await client.from('projects').select('*,project_media(*)').eq('id',id).single();if(error){toast(error.message);return}
-  await loadServices();currentMedia=projectMedia(data);pendingPhotos=[];pendingVideo=null;$('projectEditor').style.display='block';$('projectId').value=data.id;$('ptitle').value=data.title||'';$('pservice').innerHTML=serviceOptions();$('pservice').value=data.service_id||'';$('plocation').value=data.location||'';$('pyear').value=data.project_date?String(data.project_date).slice(0,4):'';$('pdescription').value=data.description||'';$('ppublished').checked=!!data.published;$('ppreview').innerHTML=currentMedia.filter(m=>m.media_type==='image').map(m=>`<div data-media-id="${esc(m.id)}" style="position:relative"><img src="${esc(m.public_url)}" alt=""><button type="button" onclick="removeExistingMedia('${esc(m.id)}')" style="position:absolute;right:2px;top:2px;border:0;border-radius:50%;background:#b5233b;color:#fff;width:22px;height:22px;cursor:pointer">×</button></div>`).join('');$('videoStatus').textContent=data.video_url?'Video actual: '+data.video_url:'';$('projectFormTitle').textContent='Editar proyecto';$('projectEditor').scrollIntoView({behavior:'smooth'})
+  const {data,error}=await client.from('projects').select('*,project_media(*)').eq('id',id).single();
+  if(error){toast(error.message);return}
+  await loadServices();
+  $('projectEditor').style.display='block';
+  $('projectId').value=data.id;
+  $('ptitle').value=data.title||'';
+  $('pservice').innerHTML=serviceOptions();
+  $('pservice').value=data.service_id||data.service||'';
+  $('plocation').value=data.location||'';
+  $('pyear').value=data.project_date ? String(data.project_date).slice(0,4) : (data.year||'');
+  $('pdescription').value=data.description||'';
+  $('ppublished').checked=data.published!==false;
+  const media=Array.isArray(data.project_media)?data.project_media:[];
+  currentImages=media.filter(m=>m.media_type==='image').sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(m=>m.public_url).filter(Boolean);
+  currentImagePaths=media.filter(m=>m.media_type==='image').sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(m=>m.storage_path).filter(Boolean);
+  const video=media.find(m=>m.media_type==='video');
+  currentVideo=video?.public_url||data.video_url||null;
+  currentVideoPath=video?.storage_path||null;
+  renderPhotoPreview();
+  $('videoStatus').textContent=currentVideo?'Video actual: '+currentVideo:'';
+  $('projectFormTitle').textContent='Editar proyecto';
+  $('projectEditor').scrollIntoView({behavior:'smooth'});
 }
-function cancelProject(){ $('projectEditor').style.display='none'; pendingPhotos=[];pendingVideo=null }
-function removeExistingMedia(id){currentMedia=currentMedia.filter(m=>String(m.id)!==String(id));renderProjectPreview()}
-function renderProjectPreview(){
-  $('ppreview').innerHTML=currentMedia.filter(m=>m.media_type==='image').map(m=>`<div style="position:relative"><img src="${esc(m.public_url)}" alt=""><button type="button" onclick="removeExistingMedia('${esc(m.id)}')" style="position:absolute;right:2px;top:2px;border:0;border-radius:50%;background:#b5233b;color:#fff;width:22px;height:22px;cursor:pointer">×</button></div>`).join('')+pendingPhotos.map(f=>`<div style="position:relative"><span style="display:block;width:110px;height:80px;padding:10px;background:#102d45;border-radius:8px;font-size:12px;overflow:hidden">${esc(f.name)}</span></div>`).join('')
+function cancelProject(){$('projectEditor').style.display='none'}
+
+function renderPhotoPreview(){
+  $('ppreview').innerHTML=currentImages.map((url,i)=>`
+    <div style="position:relative">
+      <img src="${esc(url)}" alt="">
+      <button type="button" onclick="removeImage(${i})" style="position:absolute;right:2px;top:2px;border:0;border-radius:50%;background:#b5233b;color:#fff;width:22px;height:22px;cursor:pointer">×</button>
+    </div>`).join('');
 }
-$('pphotos').addEventListener('change',e=>{pendingPhotos=[...e.target.files];renderProjectPreview()});
-$('pvideo').addEventListener('change',e=>{pendingVideo=e.target.files[0]||null;$('videoStatus').textContent=pendingVideo?`Video seleccionado: ${pendingVideo.name}`:'Sin video nuevo';});
-async function uploadTo(bucket,folder,file){const ext=(file.name.split('.').pop()||'bin').toLowerCase();const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;const {error}=await client.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});if(error)throw error;const {data}=client.storage.from(bucket).getPublicUrl(path);return {path,url:data.publicUrl}}
-async function removeStorageForMedia(m){if(!m?.storage_path)return;const bucket=m.media_type==='video'?'seaire-videos':'seaire-images';await client.storage.from(bucket).remove([m.storage_path])}
+
+function removeImage(i){currentImages.splice(i,1);renderPhotoPreview()}
+
+async function uploadFile(file,folder){
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase();
+  const path=`${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const bucket=folder==='videos'?'seaire-videos':'seaire-images';
+  const {error}=await client.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});
+  if(error)throw error;
+  const {data}=client.storage.from(bucket).getPublicUrl(path);
+  return {url:data.publicUrl,path,bucket};
+}
+$('pphotos').addEventListener('change',async e=>{
+  const files=[...e.target.files];if(!files.length)return;
+  $('projectSaveBtn').disabled=true;
+  try{
+    for(const file of files){
+      if(file.size>15*1024*1024)throw new Error('Cada fotografía debe pesar menos de 15 MB.');
+      const up=await uploadFile(file,'photos'); currentImages.push(up.url); currentImagePaths.push(up.path);
+    }
+    renderPhotoPreview();
+  }catch(err){toast('Error subiendo fotografía: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
+});
+
+$('pvideo').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>100*1024*1024){toast('El video debe pesar menos de 100 MB.');return}
+  $('projectSaveBtn').disabled=true;
+  try{
+    const up=await uploadFile(file,'videos');
+    currentVideo=up.url; currentVideoPath=up.path;
+    $('videoStatus').textContent='Video listo para publicar.';
+  }catch(err){toast('Error subiendo video: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
+});
 
 $('projectForm').addEventListener('submit',async e=>{
-  e.preventDefault();$('projectSaveBtn').disabled=true;
+  e.preventDefault();
+  $('projectSaveBtn').disabled=true;
   try{
+    const obj={
+      title:$('ptitle').value.trim(),
+      service_id:$('pservice').value||null,
+      location:$('plocation').value.trim(),
+      project_date:$('pyear').value ? `${$('pyear').value}-01-01` : null,
+      description:$('pdescription').value.trim(),
+      video_url:currentVideo||null,
+      published:$('ppublished').checked,
+      updated_at:new Date().toISOString()
+    };
     const id=$('projectId').value;
-    const payload={service_id:$('pservice').value,title:$('ptitle').value.trim(),location:$('plocation').value.trim(),project_date:$('pyear').value?`${$('pyear').value}-01-01`:null,description:$('pdescription').value.trim(),published:$('ppublished').checked,updated_at:new Date().toISOString()};
     let projectId=id;
-    if(id){const {error}=await client.from('projects').update(payload).eq('id',id);if(error)throw error}
-    else{const {data,error}=await client.from('projects').insert(payload).select('id').single();if(error)throw error;projectId=data.id}
-
-    // Remove media deleted from the editor.
     if(id){
-      const original=(projects.find(p=>String(p.id)===String(id))?.project_media)||[];
-      const keep=new Set(currentMedia.map(m=>String(m.id)));
-      for(const m of original){if(!keep.has(String(m.id))){await removeStorageForMedia(m);const {error}=await client.from('project_media').delete().eq('id',m.id);if(error)throw error}}
+      const {error}=await client.from('projects').update(obj).eq('id',id);
+      if(error)throw error;
+    }else{
+      const {data,error}=await client.from('projects').insert(obj).select('id').single();
+      if(error)throw error; projectId=data.id;
     }
-
-    let sort=(currentMedia.filter(m=>m.media_type==='image').length);
-    for(const file of pendingPhotos){if(file.size>15*1024*1024)throw new Error('Cada fotografía debe pesar menos de 15 MB.');const up=await uploadTo('seaire-images',`projects/${projectId}`,file);const {error}=await client.from('project_media').insert({project_id:projectId,media_type:'image',storage_path:up.path,public_url:up.url,sort_order:sort++});if(error)throw error}
-
-    if(pendingVideo){if(pendingVideo.size>100*1024*1024)throw new Error('El video debe pesar menos de 100 MB.');const up=await uploadTo('seaire-videos',`projects/${projectId}`,pendingVideo);const old=projects.find(p=>String(p.id)===String(projectId));if(old?.video_url){}payload.video_url=up.url;const {error}=await client.from('projects').update({video_url:up.url,updated_at:new Date().toISOString()}).eq('id',projectId);if(error)throw error;const {error:me}=await client.from('project_media').insert({project_id:projectId,media_type:'video',storage_path:up.path,public_url:up.url,sort_order:0});if(me)throw me}
-
-    toast('Proyecto guardado en Supabase.');cancelProject();await renderProjects();
-  }catch(err){toast('No se pudo guardar el proyecto: '+err.message)}finally{$('projectSaveBtn').disabled=false}
+    await client.from('project_media').delete().eq('project_id',projectId);
+    for(let i=0;i<currentImages.length;i++){
+      const path=currentImagePaths[i]||null;
+      const {error}=await client.from('project_media').insert({project_id:projectId,media_type:'image',storage_path:path,public_url:currentImages[i],sort_order:i});
+      if(error)throw error;
+    }
+    if(currentVideo){
+      const {error}=await client.from('project_media').insert({project_id:projectId,media_type:'video',storage_path:currentVideoPath,public_url:currentVideo,sort_order:0});
+      if(error)throw error;
+    }
+    cancelProject();
+    toast('Proyecto guardado correctamente y publicado en la web.');
+    await renderProjects();
+  }catch(err){toast('No se pudo guardar el proyecto: '+err.message)}
+  finally{$('projectSaveBtn').disabled=false}
 });
+
 async function deleteProject(id){
-  if(!confirm('¿Eliminar este proyecto y sus fotografías/videos?'))return;
-  try{const p=projects.find(x=>String(x.id)===String(id));for(const m of projectMedia(p))await removeStorageForMedia(m);const {error}=await client.from('projects').delete().eq('id',id);if(error)throw error;toast('Proyecto eliminado.');await renderProjects()}catch(e){toast('No se pudo eliminar: '+e.message)}
+  if(!confirm('¿Eliminar este proyecto de la página pública?'))return;
+  const {error}=await client.from('projects').delete().eq('id',id);
+  if(error)toast(error.message);
+  else{toast('Proyecto eliminado.');await renderProjects()}
 }
 
-/* BACKUP / LOCAL */
-function initLocalConfig(){cfg=window.SEAIRE_CONFIG?window.SEAIRE_CONFIG.read():{nav:{},brand:{},hero:{},about:{},servicesHead:{},projectsHead:{},quote:{},contact:{},footer:{},seo:{}};bindFields();renderNav();renderLogo()}
-$('logoFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const arr=await readImages([f]);cfg.brand.logo=arr[0];renderLogo();toast('Logo cargado. Pulsa Guardar cambios.')}catch(err){toast('No se pudo cargar el logo.')}})
-function readImages(files){return Promise.all([...files].map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1280;let w=img.width,h=img.height;if(w>max){h*=max/w;w=max}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',.76))};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(f)})))}
-function exportConfig(){const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{cfg=JSON.parse(await f.text());if(window.SEAIRE_CONFIG)cfg=Object.assign(window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT),cfg);bindFields();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.')}catch(err){toast('Archivo de configuración no válido.')}})
-function resetConfig(){if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;if(window.SEAIRE_CONFIG)cfg=window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT);bindFields();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.')}
+/* ---------------- CONTENIDO LOCAL ACTUAL ---------------- */
+
+async function initLocalConfig(){
+  cfg=window.SEAIRE_CONFIG?window.SEAIRE_CONFIG.read():{nav:{},brand:{},hero:{},about:{},servicesHead:{},projectsHead:{},quote:{},contact:{},footer:{},seo:{}};
+  try{
+    const sections=['empresa','inicio','nosotros','servicios','proyectos','cotizacion','contacto','seo','navegacion'];
+    const rows=await Promise.all(sections.map(section=>client.from('site_settings').select('data').eq('section',section).maybeSingle()));
+    const cloud={}; sections.forEach((section,i)=>{cloud[section]=rows[i].data?.data||{}});
+    if(cloud.empresa.nombre) cfg.brand.name=cloud.empresa.nombre;
+    if(cloud.empresa.razon_social) cfg.brand.legal=cloud.empresa.razon_social;
+    if(cloud.empresa.eslogan) cfg.brand.tagline=cloud.empresa.eslogan;
+    if(cloud.empresa.logo) cfg.brand.logo=cloud.empresa.logo;
+    Object.assign(cfg.hero,{badge:cloud.inicio.badge||cfg.hero.badge,title:cloud.inicio.titulo||cfg.hero.title,highlight:cloud.inicio.highlight||cfg.hero.highlight,description:cloud.inicio.descripcion||cfg.hero.description,primary:cloud.inicio.boton_principal||cfg.hero.primary,secondary:cloud.inicio.boton_secundario||cfg.hero.secondary});
+    Object.assign(cfg.about,{eyebrow:cloud.nosotros.eyebrow||cfg.about.eyebrow,title:cloud.nosotros.titulo||cfg.about.title,whoTitle:cloud.nosotros.quienes_titulo||cfg.about.whoTitle,who:cloud.nosotros.quienes_somos||cfg.about.who,mission:cloud.nosotros.mision||cfg.about.mission,vision:cloud.nosotros.vision||cfg.about.vision});
+    Object.assign(cfg.servicesHead,{eyebrow:cloud.servicios.eyebrow||cfg.servicesHead.eyebrow,title:cloud.servicios.titulo||cfg.servicesHead.title,description:cloud.servicios.descripcion||cfg.servicesHead.description});
+    Object.assign(cfg.projectsHead,{eyebrow:cloud.proyectos.eyebrow||cfg.projectsHead.eyebrow,title:cloud.proyectos.titulo||cfg.projectsHead.title,description:cloud.proyectos.descripcion||cfg.projectsHead.description});
+    Object.assign(cfg.quote,{eyebrow:cloud.cotizacion.eyebrow||cfg.quote.eyebrow,title:cloud.cotizacion.titulo||cfg.quote.title,description:cloud.cotizacion.descripcion||cfg.quote.description,button:cloud.cotizacion.boton||cfg.quote.button});
+    Object.assign(cfg.contact,{eyebrow:cloud.contacto.eyebrow||cfg.contact.eyebrow,title:cloud.contacto.titulo||cfg.contact.title,description:cloud.contacto.descripcion||cfg.contact.description,whatsapp:cloud.contacto.whatsapp||cfg.contact.whatsapp,phoneLink:cloud.contacto.phoneLink||cfg.contact.phoneLink,email:cloud.contacto.correo||cfg.contact.email});
+    Object.assign(cfg.seo,cloud.seo||{});
+    if(cloud.navegacion.footerCopyright) cfg.footer.copyright=cloud.navegacion.footerCopyright;
+    Object.assign(cfg.nav,cloud.navegacion||{});
+  }catch(e){ console.warn('No se pudo cargar contenido cloud:',e); }
+  bindFields();renderNav();renderLogo();
+}
+
+$('logoFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const arr=await readImages([f]);
+    cfg.brand.logo=arr[0];renderLogo();toast('Logo cargado. Pulsa Guardar cambios.');
+  }catch(err){toast('No se pudo cargar el logo.')}
+});
+
+function readImages(files){
+  return Promise.all([...files].map(f=>new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=1280;let w=img.width,h=img.height;
+        if(w>max){h*=max/w;w=max}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',.76));
+      };
+      img.onerror=rej;img.src=r.result;
+    };
+    r.onerror=rej;r.readAsDataURL(f);
+  })));
+}
+
+function exportConfig(){
+  const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='seaire-configuracion.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+$('importFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    cfg=JSON.parse(await f.text());
+    if(window.SEAIRE_CONFIG) cfg=Object.assign(window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT),cfg);
+    bindFields();renderNav();renderLogo();toast('Configuración importada. Pulsa Guardar cambios.');
+  }catch(err){toast('Archivo de configuración no válido.')}
+});
+
+function resetConfig(){
+  if(!confirm('¿Restablecer todos los textos y configuraciones al contenido original?'))return;
+  if(window.SEAIRE_CONFIG) cfg=window.SEAIRE_CONFIG.clone(window.SEAIRE_CONFIG.DEFAULT);
+  bindFields();renderNav();renderLogo();toast('Contenido restablecido. Pulsa Guardar cambios.');
+}
 
 async function enterAdmin(){
-  $('loginScreen').classList.add('hidden');$('authLoading').classList.add('hidden');$('adminApp').classList.remove('hidden');
-  try{initLocalConfig();await loadCloudSettings();await loadServices();await renderProjects();if(location.hash&&$(location.hash.slice(1)))showSection(location.hash.slice(1));else showSection('dashboard')}
-  catch(err){toast('Sesión iniciada, pero hubo un problema cargando datos: '+err.message)}
+  $('loginScreen').classList.add('hidden');
+  $('authLoading').classList.add('hidden');
+  $('adminApp').classList.remove('hidden');
+  try{
+    initLocalConfig();
+    await loadServices();
+    await renderProjects();
+    if(location.hash && $(location.hash.slice(1))) showSection(location.hash.slice(1));
+    else showSection('dashboard');
+  }catch(err){
+    toast('Sesión iniciada, pero hubo un problema cargando datos: '+err.message);
+  }
 }
-startAuth();
 
+startAuth();
 </script>
 </body>
 </html>
