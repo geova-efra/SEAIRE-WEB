@@ -290,7 +290,7 @@ function sectionPayloads(){
     empresa:{nombre:cfg.brand.name,legal:cfg.brand.legal,eslogan:cfg.brand.tagline,logo:cfg.brand.logo},
     inicio:{badge:cfg.hero.badge,titulo:cfg.hero.title,highlight:cfg.hero.highlight,descripcion:cfg.hero.description,primary:cfg.hero.primary,secondary:cfg.hero.secondary},
     nosotros:{eyebrow:cfg.about.eyebrow,titulo:cfg.about.title,whoTitle:cfg.about.whoTitle,quienes_somos:cfg.about.who,mision:cfg.about.mission,vision:cfg.about.vision},
-    servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description,items:(services.length?services:cfg.services).map((x,i)=>({id:String(x.id||('srv_'+i)),name:x.name||'',icon:x.icon||'⚡',description:x.description||'',enabled:x.enabled!==false,sort_order:Number(x.sort_order??i)}))},
+    servicios:{eyebrow:cfg.servicesHead.eyebrow,titulo:cfg.servicesHead.title,descripcion:cfg.servicesHead.description},
     proyectos:{eyebrow:cfg.projectsHead.eyebrow,titulo:cfg.projectsHead.title,descripcion:cfg.projectsHead.description},
     cotizacion:{eyebrow:cfg.quote.eyebrow,titulo:cfg.quote.title,descripcion:cfg.quote.description,button:cfg.quote.button},
     contacto:{eyebrow:cfg.contact.eyebrow,titulo:cfg.contact.title,descripcion:cfg.contact.description,whatsapp:cfg.contact.whatsapp,phoneLink:cfg.contact.phoneLink,correo:cfg.contact.email},
@@ -338,51 +338,49 @@ function applyCloudSettingsToConfig(rows){
   if(b.seo)cfg.seo={...cfg.seo,...b.seo};
 }
 
+async function getCloudConfig(){
+  const {data,error}=await client.from('site_settings').select('*').limit(1).maybeSingle();
+  if(error)throw error;
+  return data||null;
+}
+
 async function loadCloudSettings(){
-  const sections=['empresa','inicio','nosotros','servicios','proyectos','cotizacion','contacto','respaldo'];
-  const results=await Promise.all(sections.map(async section=>{
-    const {data,error}=await client.from('site_settings').select('data').eq('section',section).maybeSingle();
-    if(error)throw error;return [section,data?.data||{}];
-  }));
-  const rows=Object.fromEntries(results);
-  applyCloudSettingsToConfig(rows);
-  // Los servicios viven dentro de la configuración de la sección servicios.
-  if(Array.isArray(rows.servicios?.items)){
-    services=rows.servicios.items.map((x,i)=>({
-      id:String(x.id||('srv_'+Date.now().toString(36)+'_'+i)),
-      name:String(x.name||''),
-      icon:String(x.icon||'⚡'),
-      description:String(x.description||''),
-      enabled:x.enabled!==false,
-      sort_order:Number(x.sort_order??i)
-    }));
-    cfg.services=services.map(x=>({...x}));
-  }else{
-    services=(cfg.services||[]).map((x,i)=>({...x,sort_order:Number(x.sort_order??i)}));
-    cfg.services=services.map(x=>({...x}));
+  const row=await getCloudConfig();
+  const cloud=row?.config_json&&typeof row.config_json==='object'?row.config_json:{};
+  // Compatibilidad con la estructura real actual de site_settings.
+  if(row){
+    cloud.empresa={...(cloud.empresa||{}),nombre:cloud.empresa?.nombre??row.company_name??'',eslogan:cloud.empresa?.eslogan??row.tagline??'',legal:cloud.empresa?.legal??cfg.brand.legal,logo:cloud.empresa?.logo??cfg.brand.logo};
+    cloud.nosotros={...(cloud.nosotros||{}),quienes_somos:cloud.nosotros?.quienes_somos??row.about_text??'',mision:cloud.nosotros?.mision??row.mission??'',vision:cloud.nosotros?.vision??row.vision??''};
+    cloud.contacto={...(cloud.contacto||{}),whatsapp:cloud.contacto?.whatsapp??row.whatsapp??'',correo:cloud.contacto?.correo??row.email??'',ubicacion:cloud.contacto?.ubicacion??row.address??''};
   }
+  applyCloudSettingsToConfig(cloud);
   bindFields();renderNav();renderLogo();
 }
 
 async function saveAll(){
   try{
-    const payloads=sectionPayloads();
-    for(const [section,data] of Object.entries(payloads)){
-      const {error}=await client.from('site_settings').upsert({section,data,updated_at:new Date().toISOString()},{onConflict:'section'});
-      if(error)throw error;
-    }
+    const sections=sectionPayloads();
+    const current=await getCloudConfig();
+    const config_json={...(current?.config_json||{}),...sections,servicios:{...(current?.config_json?.servicios||{}),...sections.servicios},proyectos:{...(current?.config_json?.proyectos||{}),...sections.proyectos}};
+    const payload={
+      company_name:cfg.brand.name||'SEAIRE',
+      tagline:cfg.brand.tagline||'',
+      about_text:cfg.about.who||'',
+      mission:cfg.about.mission||'',
+      vision:cfg.about.vision||'',
+      whatsapp:cfg.contact.whatsapp||'',
+      email:cfg.contact.email||'',
+      address:current?.address||'',
+      config_json,
+      updated_at:new Date().toISOString()
+    };
+    let result;
+    if(current?.id) result=await client.from('site_settings').update(payload).eq('id',current.id);
+    else result=await client.from('site_settings').insert(payload);
+    if(result.error)throw result.error;
     if(window.SEAIRE_CONFIG)window.SEAIRE_CONFIG.write(cfg);
     toast('Cambios guardados en Supabase y listos para la página pública.');
   }catch(e){toast('No se pudo guardar el contenido: '+e.message)}
-}
-
-function renderStats(projectRows=null){
-  $('sCount').textContent=services.filter(s=>s.enabled!==false).length;
-  if(projectRows){
-    $('pCount').textContent=projectRows.length;
-    $('photoCount').textContent=projectRows.reduce((n,p)=>n+(p.project_media||[]).filter(m=>m.media_type==='image').length,0);
-    $('videoCount').textContent=projectRows.reduce((n,p)=>n+(p.project_media||[]).filter(m=>m.media_type==='video').length+(p.video_url?1:0),0);
-  }
 }
 
 /* AUTH */
@@ -402,62 +400,62 @@ $('loginForm').addEventListener('submit',async e=>{
 });
 $('logout').onclick=async()=>{try{if(client)await client.auth.signOut()}finally{$('adminApp').classList.add('hidden');$('loginScreen').classList.remove('hidden');$('password').value=''}};
 
-/* SERVICES - almacenados en site_settings para evitar depender del schema de services */
+/* SERVICES - usa el esquema REAL de public.services:
+   id, title, description, icon, image_url, sort_order, active, created_at, updated_at */
 async function loadServices(){
-  const {data,error}=await client.from('site_settings').select('data').eq('section','servicios').maybeSingle();
+  const {data,error}=await client.from('services').select('id,title,description,icon,image_url,sort_order,active,created_at,updated_at').order('sort_order',{ascending:true});
   if(error)throw error;
-  const items=Array.isArray(data?.data?.items)?data.data.items:null;
-  if(items){
-    services=items.map((s,i)=>({id:String(s.id||('srv_'+Date.now().toString(36)+'_'+i)),name:String(s.name||''),icon:String(s.icon||'⚡'),description:String(s.description||''),enabled:s.enabled!==false,sort_order:Number(s.sort_order??i)}));
-  }else{
-    services=(cfg?.services||[]).map((s,i)=>({...s,sort_order:Number(s.sort_order??i)}));
-  }
+  services=(data||[]).map((s,i)=>({
+    id:s.id,
+    name:String(s.title||''),
+    title:String(s.title||''),
+    icon:String(s.icon||'⚡'),
+    description:String(s.description||''),
+    image_url:s.image_url||null,
+    enabled:s.active!==false,
+    active:s.active!==false,
+    sort_order:Number(s.sort_order??i)
+  }));
   cfg.services=services.map(s=>({...s}));
   return services;
 }
-function serviceOptions(){return services.filter(s=>s.enabled!==false).map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')||'<option value="">Sin servicios activos</option>'}
+function serviceOptions(){return services.filter(s=>s.active!==false).map(s=>`<option value="${esc(s.id)}">${esc(s.icon||'⚡')} ${esc(s.name)}</option>`).join('')||'<option value="">Sin servicios activos</option>'}
 async function renderServices(){
-  try{await loadServices();$('serviceList').innerHTML=services.map(s=>`<div class="service-row"><div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div><div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small></div><div><span style="color:${s.enabled===false?'#ff9eae':'#7ff0c2'}">${s.enabled===false?'INACTIVO':'ACTIVO'}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button><button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.enabled!==false})">${s.enabled===false?'Activar':'Desactivar'}</button><button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button></div></div>`).join('')||'<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';renderStats()}
-  catch(err){$('serviceList').innerHTML='<div style="padding:20px;color:#ffb3b3">No se pudieron cargar los servicios: '+esc(err.message)+'</div>'}
+  try{
+    await loadServices();
+    $('serviceList').innerHTML=services.map(s=>`<div class="service-row"><div style="font-size:28px;text-align:center">${esc(s.icon||'⚡')}</div><div><strong>${esc(s.name)}</strong><br><small>${esc(s.description||'')}</small></div><div><span style="color:${s.active===false?'#ff9eae':'#7ff0c2'}">${s.active===false?'INACTIVO':'ACTIVO'}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" type="button" onclick="editService('${esc(s.id)}')">Editar</button><button class="mini" type="button" onclick="toggleService('${esc(s.id)}',${s.active!==false})">${s.active===false?'Activar':'Desactivar'}</button><button class="mini danger" type="button" onclick="deleteService('${esc(s.id)}')">Eliminar</button></div></div>`).join('')||'<div style="padding:20px;color:#9fb2c5">No hay servicios registrados en Supabase.</div>';
+    renderStats();
+  }catch(err){$('serviceList').innerHTML='<div style="padding:20px;color:#ffb3b3">No se pudieron cargar los servicios: '+esc(err.message)+'</div>'}
 }
 function newService(){$('serviceEditor').classList.remove('hidden');$('serviceForm').reset();$('sid').value='';$('sicon').value='⚡';$('senabled').checked=true;$('serviceFormTitle').textContent='Nuevo servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
-function editService(id){const s=services.find(x=>String(x.id)===String(id));if(!s)return;$('serviceEditor').classList.remove('hidden');$('sid').value=s.id;$('sname').value=s.name||'';$('sicon').value=s.icon||'⚡';$('sdescription').value=s.description||'';$('senabled').checked=s.enabled!==false;$('serviceFormTitle').textContent='Editar servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
+function editService(id){const s=services.find(x=>String(x.id)===String(id));if(!s)return;$('serviceEditor').classList.remove('hidden');$('sid').value=s.id;$('sname').value=s.name||'';$('sicon').value=s.icon||'⚡';$('sdescription').value=s.description||'';$('senabled').checked=s.active!==false;$('serviceFormTitle').textContent='Editar servicio';$('serviceEditor').scrollIntoView({behavior:'smooth'})}
 function cancelService(){$('serviceEditor').classList.add('hidden')}
-async function saveServicesToCloud(){
-  const current=(services||[]).map((x,i)=>({id:String(x.id||('srv_'+i)),name:String(x.name||''),icon:String(x.icon||'⚡'),description:String(x.description||''),enabled:x.enabled!==false,sort_order:Number(x.sort_order??i)}));
-  const {data:row,error:getErr}=await client.from('site_settings').select('data').eq('section','servicios').maybeSingle();
-  if(getErr)throw getErr;
-  const previous=row?.data||{};
-  const data={...previous,items:current};
-  const {error}=await client.from('site_settings').upsert({section:'servicios',data,updated_at:new Date().toISOString()},{onConflict:'section'});
-  if(error)throw error;
-  cfg.services=current.map(x=>({...x}));
-  if(window.SEAIRE_CONFIG)window.SEAIRE_CONFIG.write(cfg);
-}
 $('serviceForm').addEventListener('submit',async e=>{
   e.preventDefault();$('saveServiceBtn').disabled=true;
   try{
-    const obj={name:$('sname').value.trim(),icon:$('sicon').value.trim()||'⚡',description:$('sdescription').value.trim(),enabled:$('senabled').checked};
+    const title=$('sname').value.trim();
+    const description=$('sdescription').value.trim();
+    if(!title)throw new Error('El nombre del servicio es obligatorio.');
+    if(!description)throw new Error('La descripción del servicio es obligatoria.');
+    const obj={title,icon:$('sicon').value.trim()||'⚡',description,active:$('senabled').checked,updated_at:new Date().toISOString()};
     const id=$('sid').value;
-    if(id){
-      const i=services.findIndex(s=>String(s.id)===String(id));
-      if(i<0)throw new Error('No se encontró el servicio seleccionado.');
-      services[i]={...services[i],...obj};
-    }else{
+    let result;
+    if(id) result=await client.from('services').update(obj).eq('id',id);
+    else{
       const max=services.reduce((m,s)=>Math.max(m,Number(s.sort_order)||0),-1);
-      services.push({id:'srv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),...obj,sort_order:max+1});
+      result=await client.from('services').insert({...obj,sort_order:max+1}).select().single();
     }
-    await saveServicesToCloud();
+    if(result.error)throw result.error;
     cancelService();toast('Servicio guardado correctamente.');await renderServices();
   }catch(err){toast('No se pudo guardar el servicio: '+err.message)}finally{$('saveServiceBtn').disabled=false}
 });
 async function toggleService(id,current){
-  try{const i=services.findIndex(s=>String(s.id)===String(id));if(i<0)throw new Error('Servicio no encontrado.');services[i].enabled=!current;await saveServicesToCloud();toast('Estado actualizado.');await renderServices();}
+  try{const {error}=await client.from('services').update({active:!current,updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;toast('Estado actualizado.');await renderServices();}
   catch(e){toast('No se pudo actualizar: '+e.message)}
 }
 async function deleteService(id){
   if(!confirm('¿Eliminar este servicio?'))return;
-  try{services=services.filter(s=>String(s.id)!==String(id));await saveServicesToCloud();toast('Servicio eliminado.');await renderServices();}
+  try{const {error}=await client.from('services').delete().eq('id',id);if(error)throw error;toast('Servicio eliminado.');await renderServices();}
   catch(e){toast('No se pudo eliminar: '+e.message)}
 }
 

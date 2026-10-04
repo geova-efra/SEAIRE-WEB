@@ -284,7 +284,7 @@ function applySiteConfig(){
  }
  const serviceWrap=document.querySelector('.service-cards');
  if(serviceWrap){
-   serviceWrap.innerHTML=c.services.filter(s=>s.enabled).map(s=>`<article class="card service-card" data-service="${esc(s.id)}"><div class="icon">${esc(s.icon)}</div><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p><span class="view-work">Ver trabajos →</span></article>`).join('');
+   serviceWrap.innerHTML=c.services.filter(s=>s.enabled).map(s=>`<article class="card service-card" data-service="${esc(s.id)}"><div class="icon">${esc(s.icon)}</div><h3>${esc(s.name || s.title || '')}</h3><p>${esc(s.description)}</p><span class="view-work">Ver trabajos →</span></article>`).join('');
  }
  const ah=document.querySelector('#nosotros .section-head'); if(ah){
    ah.querySelector('.eyebrow').textContent=c.about.eyebrow; ah.querySelector('h2').textContent=c.about.title;
@@ -366,7 +366,7 @@ applySiteConfig();addEventListener('seaire-config-updated',applySiteConfig);
     serviceCards.innerHTML=services.filter(s=>s.enabled!==false).map(s=>`
       <article class="card service-card" data-service="${esc(s.id)}">
         <div class="icon">${esc(s.icon)}</div>
-        <h3>${esc(s.name)}</h3>
+        <h3>${esc(s.name || s.title || '')}</h3>
         <p>${esc(s.description)}</p>
         <span class="view-work">Ver trabajos →</span>
       </article>`).join('');
