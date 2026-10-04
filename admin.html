@@ -241,7 +241,7 @@ button,input,select,textarea{font:inherit}
    Mantiene la interfaz de este admin e integra:
    - autenticación
    - contenido institucional
-   - servicios editables guardados en site_settings (section=servicios)
+   - servicios editables guardados en la tabla services
    - proyectos (service_id + project_media)
    - fotografías y videos en Storage
    ========================================================= */
@@ -284,6 +284,17 @@ function renderNav(){
   $('navEditor').querySelectorAll('[data-n]').forEach(e=>e.oninput=()=>cfg.nav[e.dataset.n]=e.value)
 }
 function renderLogo(){const p=$('logoPreview');p.innerHTML=cfg?.brand?.logo?`<img src="${esc(cfg.brand.logo)}" alt="Logo">`:''}
+
+function renderStats(projectRows=null){
+  const serviceCount=Array.isArray(services)?services.filter(s=>s.active!==false).length:0;
+  const rows=Array.isArray(projectRows)?projectRows:projects;
+  const photoCount=rows.reduce((n,p)=>n+(Array.isArray(p.project_media)?p.project_media.filter(m=>m.media_type==='image').length:0),0);
+  const videoCount=rows.reduce((n,p)=>n+(Array.isArray(p.project_media)?p.project_media.filter(m=>m.media_type==='video').length:0),0);
+  if($('sCount'))$('sCount').textContent=serviceCount;
+  if($('pCount'))$('pCount').textContent=rows.length;
+  if($('photoCount'))$('photoCount').textContent=photoCount;
+  if($('videoCount'))$('videoCount').textContent=videoCount;
+}
 
 function sectionPayloads(){
   return {
