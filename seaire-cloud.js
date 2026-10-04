@@ -4,7 +4,7 @@
  */
 (function(){
   const C=window.SEAIRE_CONFIG;
-  if(!C?.SUPABASE_URL || !C?.SUPABASE_ANON_KEY){
+  if(!window.supabase || !C?.SUPABASE_URL || !C?.SUPABASE_ANON_KEY){
     console.error("SEAIRE: falta seaire-config.js");
     return;
   }
